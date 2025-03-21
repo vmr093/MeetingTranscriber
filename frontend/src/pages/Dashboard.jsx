@@ -3,10 +3,15 @@ import axios from "axios";
 import MeetingCard from "../components/MeetingCard";
 import MeetingModal from "../components/MeetingModal";
 import FloatingUploadButton from "../components/FloatingUploadButton";
+import UploadModal from "../components/UploadModal";
 
 function Dashboard() {
   const [meetings, setMeetings] = useState([]);
   const [selectedMeeting, setSelectedMeeting] = useState(null);
+  const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+
+  // Replace with actual MongoDB userId when login is in place
+  const userId = "YOUR_USER_ID_HERE";
 
   useEffect(() => {
     axios
@@ -24,7 +29,11 @@ function Dashboard() {
   };
 
   const handleUploadClick = () => {
-    alert("Upload button clicked!"); // 🔄 Replace with modal or upload action later
+    setIsUploadModalOpen(true);
+  };
+
+  const closeUploadModal = () => {
+    setIsUploadModalOpen(false);
   };
 
   return (
@@ -49,8 +58,17 @@ function Dashboard() {
         onClose={closeModal}
       />
 
-      {/* Floating Upload Button */}
       <FloatingUploadButton onClick={handleUploadClick} />
+
+      <UploadModal
+        isOpen={isUploadModalOpen}
+        onClose={closeUploadModal}
+        userId={userId}
+        onUploadComplete={(newMeeting) => {
+          setMeetings((prev) => [newMeeting, ...prev]);
+          closeUploadModal();
+        }}
+      />
     </div>
   );
 }

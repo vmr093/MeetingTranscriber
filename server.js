@@ -31,6 +31,10 @@ app.use("/api/auth", authRoutes);
 const uploadRoutes = require("./routes/uploadRoutes");
 app.use("/api/upload", uploadRoutes);
 
+const meetingRoutes = require("./routes/meetingRoutes");
+app.use("/api/meetings", meetingRoutes);
+
+
 // Debug: List registered routes
 app._router.stack.forEach((r) => {
   if (r.route && r.route.path) {
