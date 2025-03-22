@@ -1,83 +1,74 @@
-import { motion, AnimatePresence } from "framer-motion";
-import RecordMeeting from "./RecordMeeting";
-
 function UploadModal({ isOpen, onClose, userId, onUploadComplete }) {
+  if (!isOpen) return null;
+
+  const styles = {
+    overlay: {
+      position: "fixed",
+      top: 0,
+      left: 0,
+      width: "100vw",
+      height: "100vh",
+      backgroundColor: "rgba(0, 0, 0, 0.7)",
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      zIndex: 1000,
+    },
+    modal: {
+      backgroundColor: "var(--primary-color)", // blue background
+      padding: "2rem",
+      borderRadius: "20px",
+      width: "90%",
+      maxWidth: "400px",
+      color: "black",
+      textAlign: "center",
+    },
+    input: {
+      width: "80%",
+      padding: "0.8rem",
+      fontSize: "1rem",
+      marginBottom: "1rem",
+      border: "2px solid black",
+      borderRadius: "12px",
+      backgroundColor: "white",
+      color: "black",
+    },
+    startBtn: {
+      backgroundColor: "black",
+      color: "white",
+      border: "none",
+      padding: "0.8rem 1.2rem",
+      fontSize: "1rem",
+      borderRadius: "12px",
+      fontWeight: "bold",
+      cursor: "pointer",
+    },
+    closeBtn: {
+      marginTop: "1rem",
+      backgroundColor: "white",
+      color: "black",
+      border: "none",
+      padding: "0.5rem 1rem",
+      fontWeight: "bold",
+      borderRadius: "10px",
+      cursor: "pointer",
+    },
+  };
+
   return (
-    <AnimatePresence>
-      {isOpen && (
-        <motion.div
-          className="upload-backdrop"
-          style={styles.backdrop}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          onClick={onClose}
-        >
-          <motion.div
-            className="upload-modal"
-            style={styles.modal}
-            initial={{ y: 50, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: 50, opacity: 0 }}
-            transition={{ duration: 0.3 }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <h2 style={styles.title}>🎙️ Record a New Meeting</h2>
+    <div style={styles.overlay}>
+      <div style={styles.modal}>
+        <input type="text" placeholder="Meeting Title" style={styles.input} />
 
-            <RecordMeeting
-              userId={userId}
-              onUploadComplete={onUploadComplete}
-            />
+        <button style={styles.startBtn}>Start Recording</button>
 
-            <button onClick={onClose} style={styles.closeButton}>
-              Close
-            </button>
-          </motion.div>
-        </motion.div>
-      )}
-    </AnimatePresence>
+        <br />
+        <button style={styles.closeBtn} onClick={onClose}>
+          Close
+        </button>
+      </div>
+    </div>
   );
 }
-
-const styles = {
-  backdrop: {
-    position: "fixed",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-    zIndex: 1000,
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    padding: "1rem",
-  },
-  modal: {
-    backgroundColor: "#fff",
-    borderRadius: "16px",
-    padding: "1.5rem",
-    width: "100%",
-    maxWidth: "500px",
-    boxShadow: "0 5px 20px rgba(0,0,0,0.2)",
-  },
-  title: {
-    fontSize: "1.3rem",
-    marginBottom: "1rem",
-    color: "#222",
-    textAlign: "center",
-  },
-  closeButton: {
-    marginTop: "1rem",
-    width: "100%",
-    padding: "0.7rem",
-    fontSize: "1rem",
-    backgroundColor: "#444",
-    color: "#fff",
-    border: "none",
-    borderRadius: "10px",
-    cursor: "pointer",
-  },
-};
 
 export default UploadModal;

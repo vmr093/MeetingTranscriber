@@ -1,31 +1,33 @@
 function FloatingUploadButton({ onClick }) {
+  const styles = {
+    button: {
+      backgroundColor: "var(--primary-color)", // blue
+      color: "white",
+      border: "none",
+      padding: "1rem",
+      borderRadius: "16px",
+      fontSize: "1rem",
+      fontWeight: "bold",
+      width: "100%",
+      maxWidth: "360px", // same width as MeetingCard
+      margin: "2rem auto 0", // centers it
+      display: "block",
+      cursor: "pointer",
+      boxShadow: "0 4px 12px rgba(0, 0, 0, 0.3)",
+      transition: "transform 0.2s ease",
+    },
+  };
+
   return (
-    <button style={styles.button} onClick={onClick}>
-      ⬆️ Upload
+    <button
+      style={styles.button}
+      onClick={onClick}
+      onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.02)")}
+      onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
+    >
+      Record Meeting
     </button>
   );
 }
-
-const styles = {
-  button: {
-    position: "fixed",
-    bottom: "1.5rem",
-    right: "1.5rem",
-    backgroundColor: "#4f46e5", // Bluish color
-    color: "#fff",
-    border: "none",
-    padding: "0.8rem 1.2rem",
-    borderRadius: "30px",
-    boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
-    fontSize: "1rem",
-    zIndex: 999,
-    cursor: "pointer",
-    fontWeight: "bold",
-    transition: "transform 0.2s ease",
-  },
-  buttonHover: {
-    transform: "scale(1.05)",
-  },
-};
 
 export default FloatingUploadButton;
