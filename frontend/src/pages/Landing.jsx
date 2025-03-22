@@ -1,7 +1,61 @@
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 
 export default function Landing() {
+  const [activeSection, setActiveSection] = useState("hero");
+  const [showScrollTop, setShowScrollTop] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const sections = ["hero", "features", "about", "contact"];
+      for (let id of sections) {
+        const el = document.getElementById(id);
+        if (el) {
+          const rect = el.getBoundingClientRect();
+          if (rect.top <= 150 && rect.bottom >= 150) {
+            setActiveSection(id);
+            break;
+          }
+        }
+      }
+      setShowScrollTop(window.scrollY > 300);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const slideVariants = {
+    left: {
+      hidden: { opacity: 0, x: -50 },
+      visible: { opacity: 1, x: 0 },
+    },
+    right: {
+      hidden: { opacity: 0, x: 50 },
+      visible: { opacity: 1, x: 0 },
+    },
+  };
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const scrollTopStyle = {
+    position: "fixed",
+    bottom: "2rem",
+    right: "2rem",
+    background: "#007bff",
+    color: "#fff",
+    border: "none",
+    borderRadius: "50%",
+    width: "3rem",
+    height: "3rem",
+    fontSize: "1.5rem",
+    cursor: "pointer",
+    boxShadow: "0 2px 10px rgba(0,0,0,0.3)",
+    zIndex: 100,
+  };
+
   const styles = {
     page: {
       position: "relative",
@@ -24,11 +78,12 @@ export default function Landing() {
         "radial-gradient(circle at 20% 30%, rgba(0, 122, 255, 0.15), transparent 60%), radial-gradient(circle at 80% 70%, rgba(255, 255, 255, 0.05), transparent 60%)",
       zIndex: -1,
       pointerEvents: "none",
+      animation: "moveGradient 20s ease infinite",
     },
     nav: {
       position: "fixed",
       top: 0,
-      left: -15,
+      left: 0,
       width: "100%",
       backgroundColor: "#1e1b4b",
       zIndex: 50,
@@ -39,24 +94,22 @@ export default function Landing() {
       fontSize: "16px",
       boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
     },
-    navLink: {
-      color: "white",
+    navLink: (id) => ({
+      color: activeSection === id ? "#4eaaff" : "white",
       textDecoration: "none",
-    },
+      fontWeight: activeSection === id ? "bold" : "normal",
+      borderBottom: activeSection === id ? "2px solid #4eaaff" : "none",
+      paddingBottom: "0.2rem",
+    }),
     section: {
       padding: "6rem 1rem",
       maxWidth: "1000px",
       margin: "0 auto",
     },
-    waveTop: {
-      display: "block",
-      marginBottom: "-4rem",
-      transform: "translateY(-60px)",
-    },
     illustration: {
-      width: "200px",
+      width: "250px",
       maxWidth: "100%",
-      marginBottom: "1rem",
+      marginBottom: "5rem",
     },
     heroTitle: {
       fontSize: "1.5rem",
@@ -92,6 +145,7 @@ export default function Landing() {
       borderRadius: "0.7rem",
       border: "none",
       cursor: "pointer",
+      transition: "transform 0.2s ease",
     },
     secondaryButton: {
       backgroundColor: "#007bff",
@@ -101,6 +155,7 @@ export default function Landing() {
       borderRadius: "0.7rem",
       border: "none",
       cursor: "pointer",
+      transition: "transform 0.2s ease",
     },
     illustratedFeatures: {
       display: "grid",
@@ -113,8 +168,8 @@ export default function Landing() {
       textAlign: "center",
     },
     featureIcon: {
-      width: "120px",
-      height: "120px",
+      width: "80px",
+      height: "80px",
       marginBottom: "1rem",
     },
     cardTitle: {
@@ -139,50 +194,37 @@ export default function Landing() {
     },
   };
 
-  const FeatureIllustration = ({ img, title, desc }) => (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4 }}
-      viewport={{ once: true, amount: 0.1 }}
-      style={styles.featureBlock}
-    >
-      <img src={img} alt={title} style={styles.featureIcon} />
-      <h3 style={styles.cardTitle}>{title}</h3>
-      <p style={styles.cardText}>{desc}</p>
-    </motion.div>
-  );
-
   return (
     <div style={styles.page}>
+      <style>
+        {`
+          @keyframes moveGradient {
+            0% { background-position: 0% 0%; }
+            50% { background-position: 100% 100%; }
+            100% { background-position: 0% 0%; }
+          }
+          @keyframes waveAnimation {
+            0% { transform: translateY(60px); }
+            100% { transform: translateY(65px); }
+          }
+        `}
+      </style>
+
       <div style={styles.backgroundGradient}></div>
-      {/* Sticky Nav */}
+
       <nav style={styles.nav}>
-        <a href="#features" style={styles.navLink}>
+        <a href="#features" style={styles.navLink("features")}>
           Features
         </a>
-        <a href="#about" style={styles.navLink}>
+        <a href="#about" style={styles.navLink("about")}>
           About
         </a>
-        <a href="#contact" style={styles.navLink}>
+        <a href="#contact" style={styles.navLink("contact")}>
           Contact
         </a>
       </nav>
 
-      {/* Hero Section */}
       <section id="hero" style={styles.section}>
-        <svg
-          style={styles.waveTop}
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 1440 320"
-        >
-          <path
-            fill="#2e2a6a"
-            fillOpacity="1"
-            d="M0,160L48,165.3C96,171,192,181,288,181.3C384,181,480,171,576,149.3C672,128,768,96,864,85.3C960,75,1056,85,1152,117.3C1248,149,1344,203,1392,229.3L1440,256L1440,0L1392,0C1344,0,1248,0,1152,0C1056,0,960,0,864,0C768,0,672,0,576,0C480,0,384,0,288,0C192,0,96,0,48,0L0,0Z"
-          ></path>
-        </svg>
-
         <motion.img
           src="/assets/illustration.svg"
           alt="Hero Illustration"
@@ -213,96 +255,104 @@ export default function Landing() {
 
         <div style={styles.buttonRow}>
           <Link to="/login">
-            <button style={styles.primaryButton}>Login</button>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              style={styles.primaryButton}
+            >
+              Login
+            </motion.button>
           </Link>
           <Link to="/signup">
-            <button style={styles.secondaryButton}>Sign Up</button>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              style={styles.secondaryButton}
+            >
+              Sign Up
+            </motion.button>
           </Link>
         </div>
       </section>
 
-      {/* Features Section */}
       <motion.section
         id="features"
         style={styles.section}
-        initial={{ opacity: 0, y: 40 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        viewport={{ once: true, amount: 0.2 }}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true }}
+        variants={slideVariants.left}
       >
         <h2 style={styles.subheading}>Features</h2>
         <div style={styles.illustratedFeatures}>
-          <FeatureIllustration
-            img="/assets/summaries.svg"
-            title="AI-Powered Summaries"
-            desc="Instantly generate concise summaries from transcripts."
-          />
-          <FeatureIllustration
-            img="/assets/export.svg"
-            title="Export to PDF/Markdown"
-            desc="Download your notes in your preferred format."
-          />
-          <FeatureIllustration
-            img="/assets/history.svg"
-            title="Version History"
-            desc="View and restore previous summaries."
-          />
-          <FeatureIllustration
-            img="/assets/transcribe.svg"
-            title="Auto Transcription"
-            desc="Upload or record and get an instant transcript."
-          />
-          <FeatureIllustration
-            img="/assets/ui.svg"
-            title="Clean, Modern UI"
-            desc="Beautifully styled dashboard with animations."
-          />
-          <FeatureIllustration
-            img="/assets/secure.svg"
-            title="Secure Login"
-            desc="Sign in with Google or Apple to access your meetings."
-          />
+          <div style={styles.featureBlock}>
+            <img
+              src="/assets/summaries.svg"
+              alt="AI Summaries"
+              style={styles.featureIcon}
+            />
+            <h3 style={styles.cardTitle}>AI Summaries</h3>
+            <p style={styles.cardText}>
+              Generate concise summaries from transcripts.
+            </p>
+          </div>
+          <div style={styles.featureBlock}>
+            <img
+              src="/assets/export.svg"
+              alt="Export"
+              style={styles.featureIcon}
+            />
+            <h3 style={styles.cardTitle}>Export Options</h3>
+            <p style={styles.cardText}>Download notes in PDF or Markdown.</p>
+          </div>
         </div>
       </motion.section>
 
-      {/* About Section */}
       <motion.section
         id="about"
         style={{ ...styles.section, backgroundColor: "#2e2a6a" }}
-        initial={{ opacity: 0, y: 40 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        viewport={{ once: true, amount: 0.2 }}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true }}
+        variants={slideVariants.right}
       >
         <h2 style={styles.subheading}>About</h2>
         <p style={styles.paragraph}>
-          Built to save time and enhance productivity, MeetingTranscriber uses
-          AI to turn your spoken meetings into actionable insights. Whether
-          you're a solo founder, team leader, or freelancer, it's the easiest
-          way to stay on top of every conversation.
+          MeetingTranscriber helps you capture, summarize, and revisit meetings
+          like never before. Built for clarity and speed.
         </p>
       </motion.section>
 
-      {/* Contact Section */}
       <motion.section
         id="contact"
         style={styles.section}
-        initial={{ opacity: 0, y: 40 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        viewport={{ once: true, amount: 0.2 }}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true }}
+        variants={slideVariants.left}
       >
-        <h2 style={styles.subheading}>Contact</h2>
+        <h2 style={styles.subheading}>Contact Us</h2>
         <p style={styles.paragraph}>Have questions or feedback?</p>
-        <a href="mailto:ranjha.viola@gmail.com" style={styles.link}>
-          ranjha.viola@gmail.com
+        <a href="mailto:hello@meetingtranscriber.ai" style={styles.link}>
+          hello@meetingtranscriber.ai
         </a>
       </motion.section>
 
       <footer style={styles.footer}>
-        &copy; {new Date().getFullYear()} Made by Viola Ranjha. All rights
+        &copy; {new Date().getFullYear()} MeetingTranscriber. All rights
         reserved.
       </footer>
+
+      {showScrollTop && (
+        <motion.button
+          onClick={scrollToTop}
+          style={scrollTopStyle}
+          initial={{ opacity: 0, scale: 0.5 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.3 }}
+        >
+          ↑
+        </motion.button>
+      )}
     </div>
   );
 }
