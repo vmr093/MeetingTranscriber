@@ -83,7 +83,7 @@ export default function Landing() {
     nav: {
       position: "fixed",
       top: 0,
-      left: 0,
+      left: -15,
       width: "100%",
       backgroundColor: "#1e1b4b",
       zIndex: 50,
@@ -138,24 +138,30 @@ export default function Landing() {
       marginTop: "1rem",
     },
     primaryButton: {
-      backgroundColor: "#fff",
-      color: "#000",
-      fontWeight: "bold",
-      padding: "0.5rem 1.5rem",
-      borderRadius: "0.7rem",
-      border: "none",
-      cursor: "pointer",
-      transition: "transform 0.2s ease",
-    },
-    secondaryButton: {
-      backgroundColor: "#007bff",
+      backgroundColor: "rgba(255, 255, 255, 0.1)",
       color: "#fff",
       fontWeight: "bold",
       padding: "0.5rem 1.5rem",
-      borderRadius: "0.7rem",
-      border: "none",
+      borderRadius: "1rem",
+      border: "1px solid rgba(255, 255, 255, 0.3)",
+      backdropFilter: "blur(10px)",
+      WebkitBackdropFilter: "blur(10px)",
+      boxShadow: "0 4px 20px rgba(0,0,0,0.3)",
       cursor: "pointer",
-      transition: "transform 0.2s ease",
+      transition: "transform 0.2s ease, background 0.3s ease",
+    },
+    secondaryButton: {
+      backgroundColor: "rgba(0, 123, 255, 0.1)",
+      color: "#fff",
+      fontWeight: "bold",
+      padding: "0.5rem 1.5rem",
+      borderRadius: "1rem",
+      border: "1px solid rgba(0, 123, 255, 0.3)",
+      backdropFilter: "blur(10px)",
+      WebkitBackdropFilter: "blur(10px)",
+      boxShadow: "0 4px 20px rgba(0,0,0,0.3)",
+      cursor: "pointer",
+      transition: "transform 0.2s ease, background 0.3s ease",
     },
     illustratedFeatures: {
       display: "grid",
@@ -329,15 +335,15 @@ export default function Landing() {
         viewport={{ once: true }}
         variants={slideVariants.left}
       >
-        <h2 style={styles.subheading}>Contact Us</h2>
+        <h2 style={styles.subheading}>Contact</h2>
         <p style={styles.paragraph}>Have questions or feedback?</p>
-        <a href="mailto:hello@meetingtranscriber.ai" style={styles.link}>
+        <a href="mailto:ranjha.viola@gmail.com" style={styles.link}>
           hello@meetingtranscriber.ai
         </a>
       </motion.section>
 
       <footer style={styles.footer}>
-        &copy; {new Date().getFullYear()} MeetingTranscriber. All rights
+        &copy; {new Date().getFullYear()} Made by Viola Ranjha. All rights
         reserved.
       </footer>
 
