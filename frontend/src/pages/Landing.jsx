@@ -31,7 +31,7 @@ export default function Landing() {
           alt="Hero Illustration"
           style={styles.illustration}
         />
-        <h1 style={styles.heading}>MeetingTranscriber</h1>
+        <h1 style={styles.heroTitle}>MeetingTranscriber</h1>
         <p style={styles.paragraph}>
           Turn your conversations into clarity. Transcribe, summarize, and stay
           organized.
@@ -56,30 +56,36 @@ export default function Landing() {
         viewport={{ once: true, amount: 0.2 }}
       >
         <h2 style={styles.subheading}>Features</h2>
-        <div style={styles.cardGrid}>
-          <FeatureCard
+        <div style={styles.illustratedFeatures}>
+          <FeatureIllustration
+            img="/assets/summaries.svg"
             title="AI-Powered Summaries"
             desc="Instantly generate concise summaries from transcripts."
           />
-          <FeatureCard
+          <FeatureIllustration
+            img="/assets/export.svg"
             title="Export to PDF/Markdown"
             desc="Download your notes in your preferred format."
           />
-          <FeatureCard
+          <FeatureIllustration
+            img="/assets/history.svg"
             title="Version History"
             desc="View and restore previous summaries."
           />
-          <FeatureCard
+          <FeatureIllustration
+            img="/assets/transcribe.svg"
             title="Auto Transcription"
             desc="Upload or record and get an instant transcript."
           />
-          <FeatureCard
+          <FeatureIllustration
+            img="/assets/ui.svg"
             title="Clean, Modern UI"
             desc="Beautifully styled dashboard with animations."
           />
-          <FeatureCard
+          <FeatureIllustration
+            img="/assets/secure.svg"
             title="Secure Login"
-            desc="Sign in with Google or Apple to access your meetings."
+            desc="Sign in with Google to access your meetings."
           />
         </div>
       </motion.section>
@@ -126,15 +132,16 @@ export default function Landing() {
   );
 }
 
-function FeatureCard({ title, desc }) {
+function FeatureIllustration({ img, title, desc }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
       viewport={{ once: true, amount: 0.1 }}
-      style={styles.card}
+      style={styles.featureBlock}
     >
+      <img src={img} alt={title} style={styles.featureIcon} />
       <h3 style={styles.cardTitle}>{title}</h3>
       <p style={styles.cardText}>{desc}</p>
     </motion.div>
@@ -154,7 +161,7 @@ const styles = {
   nav: {
     position: "fixed",
     top: 0,
-    left: 0,
+    left: -15,
     width: "100%",
     backgroundColor: "#1e1b4b",
     zIndex: 50,
@@ -183,6 +190,13 @@ const styles = {
     fontSize: "2rem",
     fontWeight: "bold",
     marginBottom: "1rem",
+  },
+  heroTitle: {
+    fontSize: "1.7rem",
+    fontWeight: "900",
+    marginBottom: "1rem",
+    fontFamily: "'Orbitron', sans-serif",
+    letterSpacing: "1px",
   },
   subheading: {
     fontSize: "2rem",
@@ -221,17 +235,20 @@ const styles = {
     border: "none",
     cursor: "pointer",
   },
-  cardGrid: {
+  illustratedFeatures: {
     display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
-    gap: "2rem",
+    gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
+    gap: "3rem",
+    alignItems: "center",
+    justifyContent: "center",
   },
-  card: {
-    backgroundColor: "#322f6d",
-    padding: "1.5rem",
-    borderRadius: "1rem",
-    boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
-    textAlign: "left",
+  featureBlock: {
+    textAlign: "center",
+  },
+  featureIcon: {
+    width: "100px",
+    height: "100px",
+    marginBottom: "1rem",
   },
   cardTitle: {
     fontSize: "1.25rem",
