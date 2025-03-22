@@ -12,7 +12,7 @@ function UploadModal({ isOpen, onClose, userId, onUploadComplete }) {
     }
 
     toast.success("🎙️ Recording started!");
-    // TODO: hook up recording logic
+    // TODO: Hook up recording logic here
   };
 
   const styles = {
@@ -29,18 +29,17 @@ function UploadModal({ isOpen, onClose, userId, onUploadComplete }) {
       zIndex: 1000,
     },
     modal: {
-      backgroundColor: "rgba(0, 123, 255, 0.15)", // translucent blue
-      backdropFilter: "blur(20px)", // 💎 frosted effect
+      backgroundColor: "rgba(0, 123, 255, 0.15)", // blue glass
+      backdropFilter: "blur(20px)",
       WebkitBackdropFilter: "blur(20px)",
       borderRadius: "20px",
       padding: "2rem",
-      Wwidth: "100%",
-      maxWidth: "360px", // tightly matches card width
-      margin: "0 1.25rem", // padding on left/right (for smaller screens)
+      width: "100%",
+      maxWidth: "360px",
+      margin: "0 1.25rem",
       textAlign: "center",
-      // boxShadow: "0 4px 30px rgba(0, 0, 0, 0.4)",
       color: "#fff",
-      boxShadow: "0 0 30px rgba(0, 123, 255, 0.4)", // glowing blue effect
+      boxShadow: "0 0 15px rgba(0, 123, 255, 0.4)", // subtle base glow
     },
     input: {
       width: "95%",
@@ -74,12 +73,35 @@ function UploadModal({ isOpen, onClose, userId, onUploadComplete }) {
     },
   };
 
+  // 🔵 Animated Glow Keyframes
+  const animatedGlowStyles = `
+    @keyframes glowPulse {
+      0% {
+        box-shadow: 0 0 15px rgba(0, 123, 255, 0.4);
+      }
+      50% {
+        box-shadow: 0 0 22px rgba(0, 123, 255, 0.65);
+      }
+      100% {
+        box-shadow: 0 0 15px rgba(0, 123, 255, 0.4);
+      }
+    }
+
+    .modal-glow {
+      animation: glowPulse 2s infinite ease-in-out;
+    }
+  `;
+
   return (
     <AnimatePresence>
       {isOpen && (
         <div style={styles.overlay}>
+          {/* Inject animation CSS */}
+          <style>{animatedGlowStyles}</style>
+
           <motion.div
             style={styles.modal}
+            className="modal-glow"
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.85 }}
@@ -92,7 +114,7 @@ function UploadModal({ isOpen, onClose, userId, onUploadComplete }) {
               onChange={(e) => setTitle(e.target.value)}
               style={styles.input}
             />
-            
+
             <button style={styles.startBtn} onClick={handleStartRecording}>
               Start Recording
             </button>
