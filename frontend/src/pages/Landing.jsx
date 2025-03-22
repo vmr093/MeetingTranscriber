@@ -14,6 +14,8 @@ function Landing() {
       justifyContent: "center",
       position: "relative",
       overflow: "hidden",
+      padding: "0 1.5rem", // ✅
+      boxSizing: "border-box",
     },
     content: {
       zIndex: 2,
@@ -51,16 +53,16 @@ function Landing() {
       left: 0,
       width: "100%",
       height: "100%",
-      objectFit: "cover",
+      objectPosition: "center", // ✅ centers the focus
       zIndex: 0,
-      opacity: 0.1,
+      opacity: 0.2,
     },
   };
 
   return (
     <div style={styles.container}>
       <img
-        src="/assets/landing-illustration.svg" // <- drop your illustration here
+        src="/assets/landing-illustration.png" 
         alt="Background Art"
         style={styles.bgIllustration}
       />
@@ -71,7 +73,7 @@ function Landing() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
       >
-        <h1 style={styles.heading}>Welcome to MeetingTranscriber</h1>
+        <h1 style={styles.heading}>MeetingTranscriber</h1>
         <p style={styles.subtext}>
           AI-powered meeting notes. Modern. Secure. Mobile-first.
         </p>
