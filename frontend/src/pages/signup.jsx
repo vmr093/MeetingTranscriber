@@ -16,6 +16,7 @@ function Signup() {
       justifyContent: "center",
       alignItems: "center",
       padding: "0 1.5rem",
+      position: "relative",
     },
     formContainer: {
       backgroundColor: "rgba(255, 255, 255, 0.05)",
@@ -67,15 +68,27 @@ function Signup() {
       justifyContent: "center",
       gap: "0.5rem",
     },
+    icon: {
+      width: "20px",
+      height: "20px",
+    },
     link: {
       color: "#6ea8fe",
       cursor: "pointer",
       textDecoration: "underline",
       fontSize: "0.9rem",
     },
-    icon: {
-      width: "20px",
-      height: "20px",
+    homeButton: {
+      position: "absolute",
+      top: "1rem",
+      left: "1rem",
+      background: "transparent",
+      border: "1px solid #444",
+      color: "#fff",
+      padding: "0.5rem 1rem",
+      borderRadius: "10px",
+      fontSize: "0.9rem",
+      cursor: "pointer",
     },
   };
 
@@ -93,9 +106,7 @@ function Signup() {
     try {
       const res = await fetch("http://localhost:8080/api/auth/register", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       });
 
@@ -115,6 +126,10 @@ function Signup() {
 
   return (
     <div style={styles.page}>
+      <button style={styles.homeButton} onClick={() => navigate("/")}>
+         Home
+      </button>
+
       <div style={styles.formContainer}>
         <h2 style={{ marginBottom: "1.5rem" }}>Create an Account ✨</h2>
 
@@ -146,11 +161,13 @@ function Signup() {
           Sign Up
         </button>
 
-        <button style={styles.altButton}>
+        <button
+          style={styles.altButton}
+          onClick={() => toast("Google signup coming soon!")}
+        >
           <img src="/assets/google-icon.svg" alt="Google" style={styles.icon} />
           Continue with Google
         </button>
-
 
         <p>
           Already have an account?{" "}

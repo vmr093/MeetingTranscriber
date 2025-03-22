@@ -16,6 +16,7 @@ function Login() {
       justifyContent: "center",
       alignItems: "center",
       padding: "0 1.5rem",
+      position: "relative",
     },
     formContainer: {
       backgroundColor: "rgba(255, 255, 255, 0.05)",
@@ -77,37 +78,48 @@ function Login() {
       textDecoration: "underline",
       fontSize: "0.9rem",
     },
+    homeButton: {
+      position: "absolute",
+      top: "1rem",
+      left: "1rem",
+      background: "transparent",
+      border: "1px solid #444",
+      color: "#fff",
+      padding: "0.5rem 1rem",
+      borderRadius: "10px",
+      fontSize: "0.9rem",
+      cursor: "pointer",
+    },
   };
 
   const handleLogin = async () => {
-  if (!email || !password) {
-    toast.error("Please fill out all fields");
-    return;
-  }
-
-  try {
-    const res = await fetch("http://localhost:8080/api/auth/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ email, password }),
-    });
-
-    const data = await res.json();
-
-    if (res.ok) {
-      localStorage.setItem("token", data.token); // ✅ Save JWT
-      toast.success("Login successful!");
-      navigate("/dashboard");
-    } else {
-      toast.error(data.message || "Login failed");
+    if (!email || !password) {
+      toast.error("Please fill out all fields");
+      return;
     }
-  } catch (error) {
-    console.error("Login error:", error);
-    toast.error("An error occurred");
-  }
 
+    try {
+      const res = await fetch("http://localhost:8080/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        localStorage.setItem("token", data.token);
+        toast.success("Login successful!");
+        navigate("/dashboard");
+      } else {
+        toast.error(data.message || "Login failed");
+      }
+    } catch (error) {
+      console.error("Login error:", error);
+      toast.error("An error occurred");
+    }
   };
 
   const handleGoogleLogin = async () => {
@@ -116,7 +128,6 @@ function Login() {
       const user = result.user;
       toast.success(`Welcome, ${user.displayName || "User"}!`);
       navigate("/dashboard");
-      // Optional: send to your backend for user creation
     } catch (error) {
       console.error("Google login error:", error);
       toast.error("Google login failed");
@@ -125,6 +136,10 @@ function Login() {
 
   return (
     <div style={styles.page}>
+      <button style={styles.homeButton} onClick={() => navigate("/")}>
+        Home
+      </button>
+
       <div style={styles.formContainer}>
         <h2 style={{ marginBottom: "1.5rem" }}>Welcome Back 👋</h2>
 
@@ -152,7 +167,6 @@ function Login() {
           <img src="/assets/google-icon.svg" alt="Google" style={styles.icon} />
           Continue with Google
         </button>
-
 
         <p>
           Don’t have an account?{" "}

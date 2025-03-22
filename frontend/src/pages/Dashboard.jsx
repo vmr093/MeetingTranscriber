@@ -34,6 +34,11 @@ const styles = {
     marginTop: "1rem",
     transition: "background 0.2s ease",
   },
+  illustration: {
+    width: "100%",
+    height: "auto",
+    marginBottom: "1rem",
+  },
 };
 
 function Dashboard() {
@@ -85,6 +90,11 @@ function Dashboard() {
 
   return (
     <div style={styles.container}>
+      <img
+        src="assets/illustration.svg"
+        alt="Illustration"
+        style={styles.illustration}
+      />
       <h1 style={styles.header}>📅 My Meetings</h1>
 
       {Array.isArray(meetings) && meetings.length === 0 ? (

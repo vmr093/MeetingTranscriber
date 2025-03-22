@@ -10,7 +10,7 @@ function MeetingCard({ meeting, onClick, index = 0 }) {
       color: "#fff",
       borderRadius: "16px",
       padding: "1rem",
-      width: "100%",
+      width: "90%",
       maxWidth: "360px",
       boxShadow: `
         0 4px 12px rgba(0, 0, 0, 0.3),
