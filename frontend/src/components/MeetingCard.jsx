@@ -1,48 +1,43 @@
-import { motion } from "framer-motion";
-
 function MeetingCard({ meeting, onClick }) {
+  const { title, uploadedAt } = meeting;
+
+  const formattedDate = new Date(uploadedAt).toLocaleString();
+
+  const styles = {
+    card: {
+      backgroundColor: "#1c1c1e",
+      color: "#fff",
+      borderRadius: "16px",
+      padding: "1rem",
+      width: "100%",
+      maxWidth: "360px",
+      boxShadow: "0 4px 12px rgba(0, 0, 0, 0.3)",
+      textAlign: "center",
+      cursor: "pointer",
+      transition: "transform 0.2s ease",
+    },
+    title: {
+      fontSize: "1.1rem",
+      fontWeight: 600,
+      marginBottom: "0.3rem",
+    },
+    date: {
+      fontSize: "0.85rem",
+      color: "var(--text-muted)",
+    },
+  };
+
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 15 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
+    <div
       style={styles.card}
       onClick={() => onClick(meeting)}
+      onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.02)")}
+      onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
     >
-      <h2 style={styles.title}>{meeting.title}</h2>
-      <p style={styles.date}>{new Date(meeting.uploadedAt).toLocaleString()}</p>
-      <p style={styles.preview}>
-        {meeting.transcript
-          ? meeting.transcript.slice(0, 80) + "..."
-          : "No transcript yet."}
-      </p>
-    </motion.div>
+      <div style={styles.title}>{title}</div>
+      <div style={styles.date}>{formattedDate}</div>
+    </div>
   );
 }
-
-const styles = {
-  card: {
-    background: "#f9f9f9",
-    borderRadius: "12px",
-    padding: "1rem",
-    marginBottom: "1rem",
-    boxShadow: "0 2px 10px rgba(0,0,0,0.05)",
-    cursor: "pointer",
-  },
-  title: {
-    margin: 0,
-    fontSize: "1.2rem",
-    color: "#222",
-  },
-  date: {
-    fontSize: "0.9rem",
-    color: "#666",
-    marginBottom: "0.5rem",
-  },
-  preview: {
-    fontSize: "1rem",
-    color: "#444",
-  },
-};
 
 export default MeetingCard;
