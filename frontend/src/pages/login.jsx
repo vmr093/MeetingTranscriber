@@ -126,6 +126,9 @@ function Login() {
     try {
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
+      const token = await user.getIdToken();
+
+      localStorage.setItem("token", token);
       toast.success(`Welcome, ${user.displayName || "User"}!`);
       navigate("/dashboard");
     } catch (error) {
