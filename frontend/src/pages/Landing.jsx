@@ -174,8 +174,8 @@ export default function Landing() {
       textAlign: "center",
     },
     featureIcon: {
-      width: "80px",
-      height: "80px",
+      width: "150px",
+      height: "150px",
       marginBottom: "1rem",
     },
     cardTitle: {
@@ -302,63 +302,63 @@ export default function Landing() {
         </div>
 
         <div style={styles.illustratedFeatures}>
-          <div style={styles.featureBlock}>
-            <img
-              src="/assets/transcribe.svg"
-              alt="Transcription"
-              style={styles.featureIcon}
-            />
-            <h3 style={styles.cardTitle}>Accurate Transcription</h3>
-            <p style={styles.cardText}>
-              Turn voice into text with AI-powered precision.
-            </p>
-          </div>
-
-          <div style={styles.featureBlock}>
-            <img
-              src="/assets/summaries.svg"
-              alt="AI Summaries"
-              style={styles.featureIcon}
-            />
-            <h3 style={styles.cardTitle}>AI Summaries</h3>
-            <p style={styles.cardText}>
-              Generate concise summaries from transcripts.
-            </p>
-          </div>
-
-          <div style={styles.featureBlock}>
-            <img
-              src="/assets/export.svg"
-              alt="Export"
-              style={styles.featureIcon}
-            />
-            <h3 style={styles.cardTitle}>Export Options</h3>
-            <p style={styles.cardText}>Download notes in PDF or Markdown.</p>
-          </div>
-
-          <div style={styles.featureBlock}>
-            <img
-              src="/assets/secure.svg"
-              alt="Secure"
-              style={styles.featureIcon}
-            />
-            <h3 style={styles.cardTitle}>End-to-End Security</h3>
-            <p style={styles.cardText}>
-              Your meeting data is encrypted and secure.
-            </p>
-          </div>
-
-          <div style={styles.featureBlock}>
-            <img
-              src="/assets/history.svg"
-              alt="Version Control"
-              style={styles.featureIcon}
-            />
-            <h3 style={styles.cardTitle}>Version Control</h3>
-            <p style={styles.cardText}>
-              Revisit and restore previous summaries with ease.
-            </p>
-          </div>
+          {[
+            {
+              src: "/assets/transcribe.svg",
+              alt: "Transcription",
+              title: "Accurate Transcription",
+              text: "Turn voice into text with AI-powered precision.",
+            },
+            {
+              src: "/assets/summaries.svg",
+              alt: "Summarize",
+              title: "AI Summaries",
+              text: "Generate smart summaries with one click.",
+            },
+            {
+              src: "/assets/export.svg",
+              alt: "Export",
+              title: "Export Options",
+              text: "Download your notes in PDF or Markdown format.",
+            },
+            {
+              src: "/assets/history.svg",
+              alt: "History",
+              title: "Version History",
+              text: "Revisit previous versions of your summaries anytime.",
+            },
+            {
+              src: "/assets/secure.svg",
+              alt: "Security",
+              title: "End-to-End Security",
+              text: "Your meeting data is encrypted and secure.",
+            },
+            {
+              src: "/assets/ui.svg",
+              alt: "Intuitive UI",
+              title: "Intuitive Design",
+              text: "Enjoy a modern interface optimized for ease of use.",
+            },
+          ].map((feature, idx) => (
+            <motion.div
+              key={feature.title}
+              style={styles.featureBlock}
+              initial={{ opacity: 0, x: idx % 2 === 0 ? -50 : 50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: idx * 0.1 }}
+            >
+              <motion.img
+                src={feature.src}
+                alt={feature.alt}
+                style={styles.featureIcon}
+                whileHover={{ scale: 1.1 }}
+                transition={{ type: "spring", stiffness: 300 }}
+              />
+              <h3 style={styles.cardTitle}>{feature.title}</h3>
+              <p style={styles.cardText}>{feature.text}</p>
+            </motion.div>
+          ))}
         </div>
       </motion.section>
 
