@@ -2,7 +2,7 @@ body {
   background-color: #000; /* or #0d0d0d for a slightly softer black */
   color: #fff;
   margin: 0;
-  font-family: 'Inter', sans-serif; /* or match your UI font */
+  font-family: 'Poppins', ; /* or match your UI font */
 }
 
 :root {

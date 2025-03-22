@@ -13,8 +13,12 @@ function FloatingUploadButton({ onClick }) {
       margin: "2rem auto 0", // centers it
       display: "block",
       cursor: "pointer",
-      boxShadow: "0 4px 12px rgba(0, 0, 0, 0.3)",
+      boxShadow: `
+        0 4px 12px rgba(0, 0, 0, 0.3),
+        0 0 10px rgba(0, 123, 255, 0.2)
+        `,
       transition: "transform 0.2s ease",
+      
     },
   };
 
@@ -24,6 +28,7 @@ function FloatingUploadButton({ onClick }) {
       onClick={onClick}
       onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.02)")}
       onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
+      
     >
       Record Meeting
     </button>

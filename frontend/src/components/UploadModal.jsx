@@ -38,8 +38,9 @@ function UploadModal({ isOpen, onClose, userId, onUploadComplete }) {
       maxWidth: "360px", // tightly matches card width
       margin: "0 1.25rem", // padding on left/right (for smaller screens)
       textAlign: "center",
-      boxShadow: "0 4px 30px rgba(0, 0, 0, 0.4)",
+      // boxShadow: "0 4px 30px rgba(0, 0, 0, 0.4)",
       color: "#fff",
+      boxShadow: "0 0 30px rgba(0, 123, 255, 0.4)", // glowing blue effect
     },
     input: {
       width: "95%",
@@ -91,7 +92,7 @@ function UploadModal({ isOpen, onClose, userId, onUploadComplete }) {
               onChange={(e) => setTitle(e.target.value)}
               style={styles.input}
             />
-
+            
             <button style={styles.startBtn} onClick={handleStartRecording}>
               Start Recording
             </button>

@@ -12,7 +12,10 @@ function MeetingCard({ meeting, onClick, index = 0 }) {
       padding: "1rem",
       width: "100%",
       maxWidth: "360px",
-      boxShadow: "0 4px 12px rgba(0, 0, 0, 0.3)",
+      boxShadow: `
+        0 4px 12px rgba(0, 0, 0, 0.3),
+        0 0 10px rgba(0, 123, 255, 0.2)
+      `,
       textAlign: "center",
       cursor: "pointer",
     },
