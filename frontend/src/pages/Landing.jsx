@@ -119,7 +119,7 @@ export default function Landing() {
       letterSpacing: "1px",
     },
     subheading: {
-      fontSize: "2rem",
+      fontSize: "3rem",
       fontWeight: "bold",
       marginBottom: "2rem",
     },
@@ -288,7 +288,32 @@ export default function Landing() {
         variants={slideVariants.left}
       >
         <h2 style={styles.subheading}>Features</h2>
+
+        <div style={styles.featureBlock}>
+          <img
+            src="/assets/ui.svg"
+            alt="Transcription"
+            style={styles.featureIcon}
+          />
+          <h3 style={styles.cardTitle}>Intuitive Design</h3>
+          <p style={styles.cardText}>
+            Enjoy a modern interface optimized for ease of use.
+          </p>
+        </div>
+
         <div style={styles.illustratedFeatures}>
+          <div style={styles.featureBlock}>
+            <img
+              src="/assets/transcribe.svg"
+              alt="Transcription"
+              style={styles.featureIcon}
+            />
+            <h3 style={styles.cardTitle}>Accurate Transcription</h3>
+            <p style={styles.cardText}>
+              Turn voice into text with AI-powered precision.
+            </p>
+          </div>
+
           <div style={styles.featureBlock}>
             <img
               src="/assets/summaries.svg"
@@ -300,6 +325,7 @@ export default function Landing() {
               Generate concise summaries from transcripts.
             </p>
           </div>
+
           <div style={styles.featureBlock}>
             <img
               src="/assets/export.svg"
@@ -308,6 +334,30 @@ export default function Landing() {
             />
             <h3 style={styles.cardTitle}>Export Options</h3>
             <p style={styles.cardText}>Download notes in PDF or Markdown.</p>
+          </div>
+
+          <div style={styles.featureBlock}>
+            <img
+              src="/assets/secure.svg"
+              alt="Secure"
+              style={styles.featureIcon}
+            />
+            <h3 style={styles.cardTitle}>End-to-End Security</h3>
+            <p style={styles.cardText}>
+              Your meeting data is encrypted and secure.
+            </p>
+          </div>
+
+          <div style={styles.featureBlock}>
+            <img
+              src="/assets/history.svg"
+              alt="Version Control"
+              style={styles.featureIcon}
+            />
+            <h3 style={styles.cardTitle}>Version Control</h3>
+            <p style={styles.cardText}>
+              Revisit and restore previous summaries with ease.
+            </p>
           </div>
         </div>
       </motion.section>
@@ -338,7 +388,7 @@ export default function Landing() {
         <h2 style={styles.subheading}>Contact</h2>
         <p style={styles.paragraph}>Have questions or feedback?</p>
         <a href="mailto:ranjha.viola@gmail.com" style={styles.link}>
-          hello@meetingtranscriber.ai
+          ranjha.viola@gmail.com
         </a>
       </motion.section>
 
