@@ -3,7 +3,7 @@ import Landing from "./pages/Landing";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Dashboard from "./pages/Dashboard";
-import PrivateRoute from "./components/PrivateRoute"; // ✅ Make sure this exists!
+import PrivateRoute from "./components/PrivateRoute";
 
 function App() {
   return (

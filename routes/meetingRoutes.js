@@ -38,5 +38,18 @@ router.patch("/:id/summary", async (req, res) => {
   }
 });
 
+// GET /api/meetings/:id - Fetch a single meeting by ID
+router.get("/:id", async (req, res) => {
+  try {
+    const meeting = await Meeting.findById(req.params.id);
+    if (!meeting) {
+      return res.status(404).json({ error: "Meeting not found" });
+    }
+    res.json(meeting);
+  } catch (err) {
+    console.error("Error fetching meeting by ID:", err);
+    res.status(500).json({ error: "Failed to fetch meeting" });
+  }
+});
 
 module.exports = router;

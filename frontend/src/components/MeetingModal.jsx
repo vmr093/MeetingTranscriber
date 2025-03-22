@@ -1,7 +1,43 @@
 import { motion, AnimatePresence } from "framer-motion";
+import { useState } from "react";
+import { jsPDF } from "jspdf";
 
 function MeetingModal({ isOpen, onClose, meeting, children }) {
+  const [showHistory, setShowHistory] = useState(false);
+
   if (!meeting) return null;
+
+  const copyToClipboard = (text) => {
+    navigator.clipboard.writeText(text);
+  };
+
+  const exportMarkdown = (title, summary) => {
+    const markdown = `# ${title}\n\n${summary}`;
+    const blob = new Blob([markdown], { type: "text/markdown" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `${title}_version.md`;
+    link.click();
+  };
+
+  const exportPDF = (title, summary) => {
+    const doc = new jsPDF();
+    doc.setFontSize(14);
+    doc.text(title, 10, 10);
+    doc.setFontSize(12);
+    doc.text(summary, 10, 20);
+    doc.save(`${title}_version.pdf`);
+  };
+
+  const restoreVersion = async (versionText) => {
+    await fetch(`/api/meetings/${meeting._id}/summary`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ summary: versionText }),
+    });
+    window.location.reload();
+  };
 
   return (
     <AnimatePresence>
@@ -27,12 +63,83 @@ function MeetingModal({ isOpen, onClose, meeting, children }) {
             <p style={styles.date}>
               {new Date(meeting.uploadedAt).toLocaleString()}
             </p>
-            <div style={styles.transcript}>
-              {meeting.transcript || "Transcript not available."}
+
+            <div style={styles.transcriptStyled}>
+              <h3>Transcript</h3>
+              {meeting.transcript ? (
+                meeting.transcript.split("\n").map((line, idx) => (
+                  <p key={idx} style={{ marginBottom: "0.5rem" }}>
+                    {line.startsWith("-") ? <li>{line.slice(1)}</li> : line}
+                  </p>
+                ))
+              ) : (
+                <p>Transcript not available.</p>
+              )}
             </div>
 
-            {/* ✅ Insert children (summary, export buttons, etc.) here */}
             {children}
+
+            {Array.isArray(meeting.summaryHistory) &&
+              meeting.summaryHistory.length > 0 && (
+                <div style={{ marginTop: "1.5rem" }}>
+                  <button
+                    onClick={() => setShowHistory(!showHistory)}
+                    style={{
+                      ...styles.historyToggle,
+                      backgroundColor: showHistory ? "#ccc" : "#444",
+                      color: showHistory ? "#000" : "#fff",
+                    }}
+                  >
+                    {showHistory ? "Hide" : "Show"} Summary History
+                  </button>
+
+                  {showHistory && (
+                    <div style={styles.historyContainer}>
+                      {meeting.summaryHistory
+                        .slice()
+                        .reverse()
+                        .map((version, index) => (
+                          <div key={index} style={styles.historyBlock}>
+                            <h4>
+                              Version {meeting.summaryHistory.length - index}
+                            </h4>
+                            <pre style={styles.historyText}>{version}</pre>
+                            <div style={{ display: "flex", gap: "0.5rem" }}>
+                              <button
+                                onClick={() => restoreVersion(version)}
+                                style={styles.historyActionButton}
+                              >
+                                Restore
+                              </button>
+                              <button
+                                onClick={() => copyToClipboard(version)}
+                                style={styles.historyActionButton}
+                              >
+                                Copy
+                              </button>
+                              <button
+                                onClick={() =>
+                                  exportPDF(meeting.title, version)
+                                }
+                                style={styles.historyActionButton}
+                              >
+                                PDF
+                              </button>
+                              <button
+                                onClick={() =>
+                                  exportMarkdown(meeting.title, version)
+                                }
+                                style={styles.historyActionButton}
+                              >
+                                MD
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                    </div>
+                  )}
+                </div>
+              )}
 
             <button onClick={onClose} style={styles.button}>
               Close
@@ -57,16 +164,17 @@ const styles = {
     alignItems: "flex-end",
     padding: "1rem",
     zIndex: 1000,
+    backdropFilter: "blur(10px)",
   },
   modal: {
-    background: "#fff",
+    background: "rgba(255, 255, 255, 0.85)",
     borderRadius: "16px",
     padding: "1rem",
     width: "100%",
     maxWidth: "500px",
     maxHeight: "80vh",
     overflowY: "auto",
-    boxShadow: "0 4px 20px rgba(0,0,0,0.2)",
+    boxShadow: "0 8px 30px rgba(0,0,0,0.2)",
   },
   title: {
     fontSize: "1.3rem",
@@ -75,18 +183,21 @@ const styles = {
   },
   date: {
     fontSize: "0.9rem",
-    color: "#666",
+    color: "#333",
     marginBottom: "1rem",
   },
-  transcript: {
+  transcriptStyled: {
     fontSize: "1rem",
-    color: "#333",
-    lineHeight: 1.5,
+    color: "#222",
+    lineHeight: 1.6,
     whiteSpace: "pre-wrap",
+    backgroundColor: "#f2f2f2",
+    padding: "1rem",
+    borderRadius: "10px",
     marginBottom: "1rem",
   },
   button: {
-    marginTop: "1.5rem",
+    marginTop: "1rem",
     width: "100%",
     padding: "0.6rem",
     backgroundColor: "#444",
@@ -94,6 +205,42 @@ const styles = {
     border: "none",
     borderRadius: "8px",
     cursor: "pointer",
+  },
+  historyToggle: {
+    marginTop: "1rem",
+    padding: "0.5rem 1rem",
+    border: "none",
+    borderRadius: "8px",
+    cursor: "pointer",
+    fontWeight: "bold",
+  },
+  historyContainer: {
+    marginTop: "1rem",
+    maxHeight: "200px",
+    overflowY: "auto",
+    border: "1px solid #ddd",
+    borderRadius: "8px",
+    padding: "0.5rem",
+    backgroundColor: "#fff",
+  },
+  historyBlock: {
+    marginBottom: "1rem",
+  },
+  historyText: {
+    whiteSpace: "pre-wrap",
+    backgroundColor: "#eee",
+    padding: "0.5rem",
+    borderRadius: "6px",
+    fontSize: "0.95rem",
+  },
+  historyActionButton: {
+    padding: "0.3rem 0.6rem",
+    fontSize: "0.8rem",
+    borderRadius: "6px",
+    border: "none",
+    cursor: "pointer",
+    backgroundColor: "#333",
+    color: "#fff",
   },
 };
 

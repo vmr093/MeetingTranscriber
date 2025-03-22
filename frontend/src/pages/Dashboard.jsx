@@ -73,7 +73,7 @@ function Dashboard() {
 
   const openModal = (meeting) => {
     setSelectedMeeting(meeting);
-    setSummary(""); // Reset temp summary so we show saved one
+    setSummary(""); // Reset local summary
   };
 
   const closeModal = () => {
@@ -96,6 +96,17 @@ function Dashboard() {
     navigate("/login");
   };
 
+  const fetchMeetingById = async (id) => {
+    try {
+      const res = await axios.get(`/api/meetings/${id}`);
+      return res.data;
+    } catch (err) {
+      console.error("Failed to fetch updated meeting:", err);
+      toast.error("Could not refresh meeting");
+      return null;
+    }
+  };
+
   const getMeetingSummary = async (transcript) => {
     try {
       setLoading(true);
@@ -113,16 +124,19 @@ function Dashboard() {
         setSummary(data.summary);
         toast.success("Summary generated!");
 
-        // Save summary to MongoDB
         await fetch(`/api/meetings/${selectedMeeting._id}/summary`, {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ summary: data.summary }),
         });
 
-        // Refresh meetings list (optional)
-        const updated = await axios.get("/api/meetings");
-        setMeetings(updated.data);
+        const updatedMeeting = await fetchMeetingById(selectedMeeting._id);
+        if (updatedMeeting) {
+          setSelectedMeeting(updatedMeeting);
+        }
+
+        const all = await axios.get("/api/meetings");
+        setMeetings(all.data);
       } else {
         toast.error(data.error || "Failed to summarize.");
       }
@@ -293,9 +307,15 @@ function Dashboard() {
         isOpen={isUploadModalOpen}
         onClose={closeUploadModal}
         userId={userId}
-        onUploadComplete={(newMeeting) => {
+        onUploadComplete={async (newMeeting) => {
           setMeetings((prev) => [newMeeting, ...prev]);
           closeUploadModal();
+
+          // ✅ Auto-summarize if transcript exists
+          if (newMeeting.transcript) {
+            setSelectedMeeting(newMeeting); // Show updated modal if open
+            await getMeetingSummary(newMeeting.transcript);
+          }
         }}
       />
 
