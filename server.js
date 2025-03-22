@@ -9,6 +9,7 @@ const app = express();
 const PORT = process.env.PORT || 8080;
 const MONGO_URI = process.env.MONGO_URI;
 
+
 // Middleware
 app.use(express.json()); // Parse JSON
 app.use(cors()); // Enable CORS
@@ -33,6 +34,10 @@ app.use("/api/upload", uploadRoutes);
 
 const meetingRoutes = require("./routes/meetingRoutes");
 app.use("/api/meetings", meetingRoutes);
+
+const summarizeRoute = require("./routes/summarize");
+app.use("/api/summarize", summarizeRoute);
+
 
 
 // Debug: List registered routes

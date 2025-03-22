@@ -6,6 +6,7 @@ const MeetingSchema = new mongoose.Schema({
   audioPath: { type: String, required: true },
   transcript: { type: String }, // 👈 Add this
   uploadedAt: { type: Date, default: Date.now },
+  summary: {type: String, default: "",},
 });
 
 module.exports = mongoose.model("Meeting", MeetingSchema);

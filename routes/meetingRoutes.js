@@ -19,4 +19,24 @@ router.get("/", async (req, res) => {
   }
 });
 
+// PATCH /api/meetings/:id/summary
+router.patch("/:id/summary", async (req, res) => {
+  const { summary } = req.body;
+
+  if (!summary) return res.status(400).json({ error: "Summary is required" });
+
+  try {
+    const meeting = await Meeting.findByIdAndUpdate(
+      req.params.id,
+      { summary },
+      { new: true }
+    );
+    res.json(meeting);
+  } catch (err) {
+    console.error("Error saving summary:", err);
+    res.status(500).json({ error: "Failed to save summary" });
+  }
+});
+
+
 module.exports = router;

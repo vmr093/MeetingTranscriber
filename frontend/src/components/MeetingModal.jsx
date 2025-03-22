@@ -1,6 +1,6 @@
 import { motion, AnimatePresence } from "framer-motion";
 
-function MeetingModal({ isOpen, onClose, meeting }) {
+function MeetingModal({ isOpen, onClose, meeting, children }) {
   if (!meeting) return null;
 
   return (
@@ -30,6 +30,10 @@ function MeetingModal({ isOpen, onClose, meeting }) {
             <div style={styles.transcript}>
               {meeting.transcript || "Transcript not available."}
             </div>
+
+            {/* ✅ Insert children (summary, export buttons, etc.) here */}
+            {children}
+
             <button onClick={onClose} style={styles.button}>
               Close
             </button>
@@ -79,9 +83,10 @@ const styles = {
     color: "#333",
     lineHeight: 1.5,
     whiteSpace: "pre-wrap",
+    marginBottom: "1rem",
   },
   button: {
-    marginTop: "1rem",
+    marginTop: "1.5rem",
     width: "100%",
     padding: "0.6rem",
     backgroundColor: "#444",
