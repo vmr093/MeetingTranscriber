@@ -81,11 +81,12 @@ function Dashboard() {
         <p style={styles.empty}>No meetings yet. Upload one!</p>
       ) : (
         <div style={styles.cardList}>
-          {meetings.map((meeting) => (
+          {meetings.map((meeting, index) => (
             <MeetingCard
               key={meeting._id}
               meeting={meeting}
               onClick={openModal}
+              index={index} // ✅ pass index for delay animation
             />
           ))}
         </div>

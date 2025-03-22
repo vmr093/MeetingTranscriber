@@ -1,6 +1,7 @@
-function MeetingCard({ meeting, onClick }) {
-  const { title, uploadedAt } = meeting;
+import { motion } from "framer-motion";
 
+function MeetingCard({ meeting, onClick, index = 0 }) {
+  const { title, uploadedAt } = meeting;
   const formattedDate = new Date(uploadedAt).toLocaleString();
 
   const styles = {
@@ -14,7 +15,6 @@ function MeetingCard({ meeting, onClick }) {
       boxShadow: "0 4px 12px rgba(0, 0, 0, 0.3)",
       textAlign: "center",
       cursor: "pointer",
-      transition: "transform 0.2s ease",
     },
     title: {
       fontSize: "1.1rem",
@@ -28,15 +28,18 @@ function MeetingCard({ meeting, onClick }) {
   };
 
   return (
-    <div
+    <motion.div
       style={styles.card}
       onClick={() => onClick(meeting)}
-      onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.02)")}
-      onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3, delay: index * 0.1 }}
+      whileHover={{ scale: 1.03 }}
+      whileTap={{ scale: 0.98 }}
     >
       <div style={styles.title}>{title}</div>
       <div style={styles.date}>{formattedDate}</div>
-    </div>
+    </motion.div>
   );
 }
 

@@ -1,5 +1,19 @@
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import toast from "react-hot-toast";
+
 function UploadModal({ isOpen, onClose, userId, onUploadComplete }) {
-  if (!isOpen) return null;
+  const [title, setTitle] = useState("");
+
+  const handleStartRecording = () => {
+    if (!title.trim()) {
+      toast.error("Please enter a meeting title");
+      return;
+    }
+
+    toast.success("🎙️ Recording started!");
+    // TODO: hook up recording logic
+  };
 
   const styles = {
     overlay: {
@@ -8,23 +22,27 @@ function UploadModal({ isOpen, onClose, userId, onUploadComplete }) {
       left: 0,
       width: "100vw",
       height: "100vh",
-      backgroundColor: "rgba(0, 0, 0, 0.7)",
+      backgroundColor: "rgba(0, 0, 0, 0.6)",
       display: "flex",
       justifyContent: "center",
       alignItems: "center",
       zIndex: 1000,
     },
     modal: {
-      backgroundColor: "var(--primary-color)", // blue background
-      padding: "2rem",
+      backgroundColor: "rgba(0, 123, 255, 0.15)", // translucent blue
+      backdropFilter: "blur(20px)", // 💎 frosted effect
+      WebkitBackdropFilter: "blur(20px)",
       borderRadius: "20px",
-      width: "90%",
-      maxWidth: "400px",
-      color: "black",
+      padding: "2rem",
+      Wwidth: "100%",
+      maxWidth: "360px", // tightly matches card width
+      margin: "0 1.25rem", // padding on left/right (for smaller screens)
       textAlign: "center",
+      boxShadow: "0 4px 30px rgba(0, 0, 0, 0.4)",
+      color: "#fff",
     },
     input: {
-      width: "80%",
+      width: "95%",
       padding: "0.8rem",
       fontSize: "1rem",
       marginBottom: "1rem",
@@ -56,18 +74,36 @@ function UploadModal({ isOpen, onClose, userId, onUploadComplete }) {
   };
 
   return (
-    <div style={styles.overlay}>
-      <div style={styles.modal}>
-        <input type="text" placeholder="Meeting Title" style={styles.input} />
+    <AnimatePresence>
+      {isOpen && (
+        <div style={styles.overlay}>
+          <motion.div
+            style={styles.modal}
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.85 }}
+            transition={{ duration: 0.3 }}
+          >
+            <input
+              type="text"
+              placeholder="Meeting Title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              style={styles.input}
+            />
 
-        <button style={styles.startBtn}>Start Recording</button>
+            <button style={styles.startBtn} onClick={handleStartRecording}>
+              Start Recording
+            </button>
 
-        <br />
-        <button style={styles.closeBtn} onClick={onClose}>
-          Close
-        </button>
-      </div>
-    </div>
+            <br />
+            <button style={styles.closeBtn} onClick={onClose}>
+              Close
+            </button>
+          </motion.div>
+        </div>
+      )}
+    </AnimatePresence>
   );
 }
 
