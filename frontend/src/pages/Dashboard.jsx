@@ -46,26 +46,26 @@ const styles = {
   },
 
   header: {
-    fontSize: "2rem",
+    fontSize: "2.5rem",
     marginBottom: "1rem",
   },
   search: {
     marginBottom: "1.5rem",
-    padding: "0.3rem 1rem",
+    padding: "0.2rem 1rem",
     borderRadius: "8px",
     border: "1px solid #444",
-    width: "60%",
+    width: "50%",
     maxWidth: "300px",
     background: "#111",
     color: "#fff",
     fontSize: "1rem",
   },
   meetingsContainer: {
-    display: "grid", // Use grid layout
-    gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))", // Responsive columns
-    gap: "1rem", // Add spacing between the cards
-    justifyContent: "center", // Center the grid horizontally
-    padding: "1rem", // Optional padding around the grid
+    display: "flex", // Ensure flexbox is enabled
+    flexDirection: "column", // Stack cards vertically
+    gap: "1rem", // Add spacing between cards
+    alignItems: "center", // Center cards horizontally (optional)
+    padding: "1rem",
     marginBottom: "7rem",
   },
   empty: {
