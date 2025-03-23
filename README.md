@@ -8,7 +8,7 @@ MeetingTranscriber helps you convert conversations into structured summaries usi
 
 ## 🚀 Features
 
-- 🎤 Upload or record meeting audio
+- 🎤 Record meeting audio
 - 🤖 AI-generated summaries
 - 🗂️ Version control for summaries
 - 🔐 Secure login and authentication (JWT + Google OAuth)
