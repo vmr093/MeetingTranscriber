@@ -46,15 +46,15 @@ const styles = {
   },
 
   header: {
-    fontSize: "2.5rem",
+    fontSize: "2rem",
     marginBottom: "1rem",
   },
   search: {
     marginBottom: "1.5rem",
-    padding: "0.5rem 1rem",
+    padding: "0.3rem 1rem",
     borderRadius: "8px",
     border: "1px solid #444",
-    width: "80%",
+    width: "60%",
     maxWidth: "300px",
     background: "#111",
     color: "#fff",
@@ -66,6 +66,7 @@ const styles = {
     gap: "1rem", // Add spacing between the cards
     justifyContent: "center", // Center the grid horizontally
     padding: "1rem", // Optional padding around the grid
+    marginBottom: "7rem",
   },
   empty: {
     color: "var(--text-muted)",
@@ -75,7 +76,7 @@ const styles = {
     backgroundColor: "rgba(255, 255, 255, 0.05)",
     color: "#fff",
     border: "1px solid rgba(255, 255, 255, 0.2)",
-    padding: "0.5rem 1rem",
+    padding: "0.3rem 1rem",
     borderRadius: "12px",
     cursor: "pointer",
     fontWeight: "bold",

@@ -1,4 +1,4 @@
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, color } from "framer-motion";
 import { useState } from "react";
 import { jsPDF } from "jspdf";
 
@@ -191,6 +191,7 @@ const styles = {
     fontSize: "1.3rem",
     fontWeight: "bold",
     marginBottom: "0.3rem",
+    color: "#333",
   },
   date: {
     fontSize: "0.9rem",
