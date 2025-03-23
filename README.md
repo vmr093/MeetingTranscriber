@@ -21,7 +21,7 @@ MeetingTranscriber helps you convert conversations into structured summaries usi
 
 ## 🖥️ Demo
 
-> _(Coming Soon: Hosted demo link or video walkthrough)_
+> _https://meeting-transcriber-7ya7nzwy4-vmr093s-projects.vercel.app/_
 
 ---
 
