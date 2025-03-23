@@ -13,7 +13,7 @@ MeetingTranscriber helps you convert conversations into structured summaries usi
 - 🗂️ Version control for summaries
 - 🔐 Secure login and authentication (JWT + Google OAuth)
 - 🧠 Automatic transcript processing with Whisper + OpenAI
-- 🔍 Search and tag meetings
+- 🔍 Search ameetings
 - 📄 Export summaries as PDF or Markdown
 - 🎨 Beautiful, responsive UI with animations and modern effects
 
@@ -45,20 +45,20 @@ MeetingTranscriber helps you convert conversations into structured summaries usi
 
 ## Setup the Backend
 
-cd backend
-npm install
+- cd backend
+- npm install
 
 ## Creat a .env file
 
-PORT=8080
-MONGO_URI=your_mongodb_uri
-OPENAI_API_KEY=your_openai_key
+- PORT=8080
+- MONGO_URI=your_mongodb_uri
+- OPENAI_API_KEY=your_openai_key
 
 ## Setup the Front End
 
-cd ../frontend
-npm install
-npm run dev
+- cd ../frontend
+- npm install
+- npm run dev
 
 ## 🔐 Authentication
 **MeetingTranscriber uses:**
