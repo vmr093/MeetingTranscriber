@@ -54,7 +54,7 @@ function MeetingModal({ isOpen, onClose, meeting }) {
 
   const restoreVersion = async (versionText) => {
     try {
-      const response = await fetch(`/api/meetings/${meeting._id}/summary`, {
+      const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/meetings/${meeting._id}/summary`, { // Use environment variable
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ summary: versionText }),
@@ -286,7 +286,7 @@ const styles = {
     top: 0,
     left: 0,
     right: 0,
-    bottom: 0,
+    bottom: 30,
     backgroundColor: "rgba(0, 0, 0, 0.4)",
     display: "flex",
     justifyContent: "center",
@@ -297,13 +297,14 @@ const styles = {
   },
   modal: {
     background: "rgba(181, 185, 245, 0.85)",
-    borderRadius: "16px",
-    padding: "1.5rem",
+    borderRadius: "25px",
+    padding: "1rem",
     width: "100%",
     maxWidth: "600px",
-    maxHeight: "80vh",
+    maxHeight: "75vh",
     overflowY: "auto",
     boxShadow: "0 8px 30px rgba(0,0,0,0.2)",
+    
   },
   title: {
     fontSize: "2rem",

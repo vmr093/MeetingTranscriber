@@ -110,7 +110,7 @@ function Dashboard() {
 
   useEffect(() => {
     axios
-      .get("/api/meetings")
+      .get(`${process.env.REACT_APP_API_BASE_URL}/api/meetings`) // Use environment variable
       .then((res) => {
         if (Array.isArray(res.data)) {
           setMeetings(res.data);

@@ -28,7 +28,7 @@ function RecordMeeting({ userId, onUploadComplete }) {
 
       try {
         const res = await axios.post(
-          "http://localhost:8080/api/upload",
+          `${process.env.REACT_APP_API_BASE_URL}/api/upload`, // Use environment variable
           formData
         );
         alert("Upload and transcription complete!");

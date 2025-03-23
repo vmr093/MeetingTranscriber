@@ -104,7 +104,7 @@ function Signup() {
     }
 
     try {
-      const res = await fetch("http://localhost:8080/api/auth/register", {
+      const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/auth/register`, { // Use environment variable
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),

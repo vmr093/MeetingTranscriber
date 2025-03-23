@@ -5,14 +5,34 @@ import toast from "react-hot-toast";
 function UploadModal({ isOpen, onClose, userId, onUploadComplete }) {
   const [title, setTitle] = useState("");
 
-  const handleStartRecording = () => {
+  const handleStartRecording = async () => {
     if (!title.trim()) {
       toast.error("Please enter a meeting title");
       return;
     }
 
-    toast.success("🎙️ Recording started!");
-    // TODO: Hook up recording logic here
+    try {
+      const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/meetings/start-recording`, { // Use environment variable
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ title, userId }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        toast.success("🎙️ Recording started!");
+        onUploadComplete(data); // Notify parent component of successful upload
+        onClose(); // Close the modal
+      } else {
+        toast.error(data.message || "Failed to start recording");
+      }
+    } catch (error) {
+      console.error("Error starting recording:", error);
+      toast.error("An error occurred. Please try again.");
+    }
   };
 
   const styles = {

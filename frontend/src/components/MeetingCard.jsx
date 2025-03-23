@@ -9,9 +9,9 @@ function MeetingCard({ meeting, onClick, index = 0 }) {
       backgroundColor: "#2d3a69", // Set the box's background color
       color: "#fff",
       borderRadius: "10px",
-      padding: "rem",
+      padding: "0.5rem",
       width: "250px",
-      height: "15px",
+      height: "40px",
       boxShadow: `
         0 4px 12px rgba(0, 0, 0, 0.3),
         0 0 10px rgba(0, 123, 255, 0.2)
