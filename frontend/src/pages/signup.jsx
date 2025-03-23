@@ -26,13 +26,13 @@ function Signup() {
       borderRadius: "20px",
       width: "100%",
       maxWidth: "400px",
-      boxShadow: "0 0 20px rgba(0, 123, 255, 0.4)",
+      boxShadow: "0 0 20px rgba(84, 56, 208, 0.86)",
       color: "#fff",
       textAlign: "center",
     },
     input: {
       width: "100%",
-      padding: "0.8rem",
+      padding: "0.3rem",
       marginBottom: "1rem",
       borderRadius: "12px",
       border: "2px solid black",
@@ -42,7 +42,7 @@ function Signup() {
     },
     button: {
       width: "100%",
-      padding: "0.8rem",
+      padding: "0.5rem",
       backgroundColor: "black",
       color: "white",
       border: "none",
@@ -54,12 +54,12 @@ function Signup() {
     },
     altButton: {
       width: "100%",
-      padding: "0.8rem",
+      padding: "0.5rem",
       backgroundColor: "#fff",
       color: "#000",
       borderRadius: "12px",
       fontWeight: "bold",
-      fontSize: "1rem",
+      fontSize: "0.7rem",
       marginBottom: "0.75rem",
       border: "none",
       cursor: "pointer",
@@ -87,7 +87,7 @@ function Signup() {
       color: "#fff",
       padding: "0.5rem 1rem",
       borderRadius: "10px",
-      fontSize: "0.9rem",
+      fontSize: "0.7rem",
       cursor: "pointer",
     },
   };
@@ -131,7 +131,7 @@ function Signup() {
       </button>
 
       <div style={styles.formContainer}>
-        <h2 style={{ marginBottom: "1.5rem" }}>Create an Account ✨</h2>
+        <h2 style={{ marginBottom: "1.5rem" }}>Create an Account</h2>
 
         <input
           type="email"

@@ -4,12 +4,12 @@ function FloatingUploadButton({ onClick }) {
       backgroundColor: "var(--primary-color)", // blue
       color: "white",
       border: "none",
-      padding: "1rem",
+      padding: "0.7rem",
       borderRadius: "16px",
       fontSize: "1rem",
       fontWeight: "bold",
       width: "100%",
-      maxWidth: "360px", // same width as MeetingCard
+      maxWidth: "300px", // same width as MeetingCard
       margin: "2rem auto 0", // centers it
       display: "block",
       cursor: "pointer",

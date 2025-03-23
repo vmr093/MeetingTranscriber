@@ -78,36 +78,38 @@ const styles = {
   wrapper: {
     padding: "1rem",
     background: "#f8f8f8",
-    borderRadius: "12px",
+    borderRadius: "10px",
     marginTop: "1rem",
     textAlign: "center",
     boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
   },
   input: {
-    padding: "0.5rem",
+    padding: "0.1rem",
     marginBottom: "0.8rem",
     width: "100%",
     fontSize: "1rem",
-    borderRadius: "8px",
+    borderRadius: "5px",
     border: "1px solid #ccc",
   },
   buttonStart: {
     background: "#28a745",
     color: "white",
-    padding: "0.8rem 1.2rem",
-    fontSize: "1rem",
+    padding: "0.1rem 1rem", // Reduced padding for a thinner look
+    fontSize: "0.5rem", // Slightly smaller font size
     border: "none",
-    borderRadius: "10px",
+    borderRadius: "4px", // Reduced border radius for a sleeker look
     cursor: "pointer",
+    transition: "all 0.2s ease-in-out", // Add a smooth hover effect
   },
   buttonStop: {
     background: "#dc3545",
     color: "white",
-    padding: "0.8rem 1.2rem",
-    fontSize: "1rem",
+    padding: "0.5rem 1rem", // Reduced padding for a thinner look
+    fontSize: "0.5rem", // Slightly smaller font size
     border: "none",
-    borderRadius: "10px",
+    borderRadius: "4px", // Reduced border radius for a sleeker look
     cursor: "pointer",
+    transition: "all 0.2s ease-in-out", // Add a smooth hover effect
   },
 };
 

@@ -10,37 +10,89 @@ import MeetingModal from "../components/MeetingModal";
 import FloatingUploadButton from "../components/FloatingUploadButton";
 import UploadModal from "../components/UploadModal";
 
+const themeColors = ["#2d3a69", "#1e3a8a", "#2a4365", "#3c366b", "#1a365d"];
+
 const styles = {
   container: {
     padding: "1.5rem",
-    maxWidth: "600px",
+    maxWidth: "800px",
     margin: "0 auto",
     textAlign: "center",
     color: "#fff",
+    position: "relative",
+    zIndex: 1,
   },
+  backgroundGradient: {
+    position: "fixed",
+    top: 0,
+    left: 0,
+    width: "100vw",
+    height: "100vh",
+    background:
+      "radial-gradient(circle at 40% 30%, rgba(0, 123, 255, 0.2), transparent 60%),\n       radial-gradient(circle at 70% 80%, rgba(255, 255, 255, 0.08), transparent 60%)",
+    zIndex: 0,
+    pointerEvents: "none",
+    animation: "pulseGradient 20s ease-in-out infinite",
+  },
+  darkPanel: {
+    position: "fixed",
+    bottom: 0,
+    left: 0,
+    width: "100%",
+    height: "120px",
+    background: "linear-gradient(to top, rgba(14, 25, 78, 0.95), transparent)",
+    zIndex: 0,
+    pointerEvents: "none",
+  },
+
   header: {
     fontSize: "2.5rem",
+    marginBottom: "1rem",
+  },
+  search: {
     marginBottom: "1.5rem",
+    padding: "0.5rem 1rem",
+    borderRadius: "8px",
+    border: "1px solid #444",
+    width: "80%",
+    maxWidth: "300px",
+    background: "#111",
+    color: "#fff",
+    fontSize: "1rem",
+  },
+  meetingsContainer: {
+    display: "grid", // Use grid layout
+    gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))", // Responsive columns
+    gap: "1rem", // Add spacing between the cards
+    justifyContent: "center", // Center the grid horizontally
+    padding: "1rem", // Optional padding around the grid
   },
   empty: {
     color: "var(--text-muted)",
     fontStyle: "italic",
   },
   logout: {
-    backgroundColor: "#111",
+    backgroundColor: "rgba(255, 255, 255, 0.05)",
     color: "#fff",
-    border: "1px solid #333",
+    border: "1px solid rgba(255, 255, 255, 0.2)",
     padding: "0.5rem 1rem",
     borderRadius: "12px",
     cursor: "pointer",
     fontWeight: "bold",
     marginTop: "1rem",
-    transition: "background 0.2s ease",
+    backdropFilter: "blur(10px)",
+    WebkitBackdropFilter: "blur(10px)",
+    transition: "all 0.3s ease",
   },
-  illustration: {
-    width: "100%",
-    height: "auto",
-    marginBottom: "1rem",
+  recordButton: {
+    width: "56px",
+    height: "56px",
+    borderRadius: "50%",
+    backgroundColor: "#ff4d4d",
+    border: "3px solid #cc0000",
+    margin: "1.5rem auto",
+    cursor: "pointer",
+    boxShadow: "0 0 12px rgba(255, 77, 77, 0.5)",
   },
 };
 
@@ -50,9 +102,10 @@ function Dashboard() {
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const [summary, setSummary] = useState("");
   const [loading, setLoading] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
 
-  const userId = "YOUR_USER_ID_HERE"; // Replace with actual logic when ready
+  const userId = "YOUR_USER_ID_HERE";
 
   useEffect(() => {
     axios
@@ -73,7 +126,7 @@ function Dashboard() {
 
   const openModal = (meeting) => {
     setSelectedMeeting(meeting);
-    setSummary(""); // Reset local summary
+    setSummary("");
   };
 
   const closeModal = () => {
@@ -96,233 +149,96 @@ function Dashboard() {
     navigate("/login");
   };
 
-  const fetchMeetingById = async (id) => {
-    try {
-      const res = await axios.get(`/api/meetings/${id}`);
-      return res.data;
-    } catch (err) {
-      console.error("Failed to fetch updated meeting:", err);
-      toast.error("Could not refresh meeting");
-      return null;
-    }
-  };
-
-  const getMeetingSummary = async (transcript) => {
-    try {
-      setLoading(true);
-      setSummary("");
-
-      const res = await fetch("/api/summarize", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ transcript }),
-      });
-
-      const data = await res.json();
-
-      if (res.ok) {
-        setSummary(data.summary);
-        toast.success("Summary generated!");
-
-        await fetch(`/api/meetings/${selectedMeeting._id}/summary`, {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ summary: data.summary }),
-        });
-
-        const updatedMeeting = await fetchMeetingById(selectedMeeting._id);
-        if (updatedMeeting) {
-          setSelectedMeeting(updatedMeeting);
-        }
-
-        const all = await axios.get("/api/meetings");
-        setMeetings(all.data);
-      } else {
-        toast.error(data.error || "Failed to summarize.");
-      }
-    } catch (err) {
-      console.error(err);
-      toast.error("An unexpected error occurred.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const exportToPDF = (title, summary, transcript) => {
-    const doc = new jsPDF();
-    doc.setFontSize(14);
-    doc.text(title, 10, 10);
-
-    doc.setFontSize(12);
-    doc.text("Summary:", 10, 20);
-    doc.text(summary || "No summary available", 10, 30);
-
-    doc.addPage();
-    doc.text("Transcript:", 10, 10);
-    doc.setFontSize(10);
-    doc.text(transcript || "No transcript", 10, 20);
-
-    doc.save(`${title}_meeting_summary.pdf`);
-  };
-
-  const exportToMarkdown = (title, summary, transcript) => {
-    const markdown = `# ${title}\n\n## Summary\n${summary}\n\n---\n\n## Transcript\n${transcript}`;
-    const blob = new Blob([markdown], { type: "text/markdown" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = `${title}_summary.md`;
-    link.click();
-  };
+  const filteredMeetings = meetings.filter((meeting) =>
+    meeting.title.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
-    <div style={styles.container}>
-      <img
-        src="assets/illustration.svg"
-        alt="Illustration"
-        style={styles.illustration}
-      />
-      <h1 style={styles.header}>My Meetings</h1>
+    <>
+      <style>{`
+        @keyframes pulseGradient {
+          0%, 100% { opacity: 0.5; transform: scale(1); }
+          50% { opacity: 1; transform: scale(1.1); }
+        }
+      `}</style>
 
-      {Array.isArray(meetings) && meetings.length === 0 ? (
-        <p style={styles.empty}>No meetings yet. Upload one!</p>
-      ) : (
-        meetings.map((meeting) => (
-          <MeetingCard
-            key={meeting._id}
-            meeting={meeting}
-            onClick={openModal}
-          />
-        ))
-      )}
+      <div style={styles.backgroundGradient}></div>
+      <div style={styles.darkPanel}></div>
 
-      <MeetingModal
-        isOpen={!!selectedMeeting}
-        meeting={selectedMeeting}
-        onClose={closeModal}
-      >
-        {selectedMeeting && (
-          <div>
-            {!selectedMeeting.summary && (
-              <button
-                style={{
-                  background: "#000",
-                  color: "#fff",
-                  padding: "0.5rem 1rem",
-                  borderRadius: "8px",
-                  marginTop: "1rem",
-                  cursor: "pointer",
-                }}
-                onClick={() =>
-                  getMeetingSummary(
-                    selectedMeeting.transcript ||
-                      "The team discussed launching the new feature next week. Action items: John will QA the deployment, Lisa will prepare documentation."
-                  )
-                }
-                disabled={loading}
-              >
-                {loading ? "Generating..." : "Generate Summary"}
-              </button>
-            )}
+      <div style={styles.container}>
+        <h1 style={styles.header}>My Meetings</h1>
 
-            {loading && (
-              <p style={{ marginTop: "1rem", fontStyle: "italic" }}>
-                Generating summary...
-              </p>
-            )}
+        <input
+          type="text"
+          placeholder="Search meetings..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          style={styles.search}
+        />
 
-            {(summary || selectedMeeting.summary) && (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
-                style={{
-                  background: "#fff",
-                  color: "#000",
-                  padding: "1rem",
-                  marginTop: "1rem",
-                  borderRadius: "12px",
-                  textAlign: "left",
-                  boxShadow: "0 0 10px rgba(0,0,0,0.2)",
-                }}
-              >
-                <h3 style={{ fontWeight: "bold", marginBottom: "0.5rem" }}>
-                  AI Summary
-                </h3>
-                <pre style={{ whiteSpace: "pre-wrap" }}>
-                  {summary || selectedMeeting.summary}
-                </pre>
-
-                <div
-                  style={{ marginTop: "1rem", display: "flex", gap: "1rem" }}
-                >
-                  <button
-                    onClick={() =>
-                      exportToPDF(
-                        selectedMeeting.title,
-                        summary || selectedMeeting.summary,
-                        selectedMeeting.transcript
-                      )
-                    }
-                    style={{
-                      padding: "0.4rem 0.8rem",
-                      background: "#007bff",
-                      color: "#fff",
-                      border: "none",
-                      borderRadius: "8px",
-                      cursor: "pointer",
-                    }}
-                  >
-                    Export PDF
-                  </button>
-                  <button
-                    onClick={() =>
-                      exportToMarkdown(
-                        selectedMeeting.title,
-                        summary || selectedMeeting.summary,
-                        selectedMeeting.transcript
-                      )
-                    }
-                    style={{
-                      padding: "0.4rem 0.8rem",
-                      background: "#28a745",
-                      color: "#fff",
-                      border: "none",
-                      borderRadius: "8px",
-                      cursor: "pointer",
-                    }}
-                  >
-                    Export Markdown
-                  </button>
-                </div>
-              </motion.div>
-            )}
+        {filteredMeetings.length === 0 ? (
+          <p style={styles.empty}>No meetings found.</p>
+        ) : (
+          <div style={styles.meetingsContainer}>
+            {filteredMeetings.map((meeting, index) => (
+              <MeetingCard key={meeting._id} meeting={meeting} onClick={openModal} />
+            ))}
           </div>
         )}
-      </MeetingModal>
 
-      <FloatingUploadButton onClick={handleUploadClick} />
+        <div
+          style={styles.recordButton}
+          title="Record"
+          onClick={() => toast("Recording feature coming soon!")}
+        />
 
-      <UploadModal
-        isOpen={isUploadModalOpen}
-        onClose={closeUploadModal}
-        userId={userId}
-        onUploadComplete={async (newMeeting) => {
-          setMeetings((prev) => [newMeeting, ...prev]);
-          closeUploadModal();
+        <MeetingModal
+          isOpen={!!selectedMeeting}
+          meeting={selectedMeeting}
+          onClose={closeModal}
+        >
+          {selectedMeeting && (
+            <>
+              {(!selectedMeeting.summary || selectedMeeting.summary === "") && (
+                <button
+                  onClick={() => toast("Summary generation coming soon!")}
+                  style={{
+                    background: "#000",
+                    color: "#fff",
+                    padding: "0.5rem 1rem",
+                    borderRadius: "8px",
+                    marginTop: "1rem",
+                    cursor: "pointer",
+                  }}
+                >
+                  Generate Summary
+                </button>
+              )}
+            </>
+          )}
+        </MeetingModal>
 
-          // ✅ Auto-summarize if transcript exists
-          if (newMeeting.transcript) {
-            setSelectedMeeting(newMeeting); // Show updated modal if open
-            await getMeetingSummary(newMeeting.transcript);
-          }
-        }}
-      />
+        <UploadModal
+          isOpen={isUploadModalOpen}
+          onClose={closeUploadModal}
+          userId={userId}
+          onUploadComplete={(newMeeting) => {
+            setMeetings((prev) => [newMeeting, ...prev]);
+            closeUploadModal();
+          }}
+        />
 
-      <button style={styles.logout} onClick={handleLogout}>
-        Log Out
-      </button>
-    </div>
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          transition={{ type: "spring", stiffness: 200 }}
+          style={styles.logout}
+          onClick={handleLogout}
+        >
+          Log Out
+        </motion.button>
+      </div>
+    </>
   );
 }
 

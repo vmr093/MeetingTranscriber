@@ -2,13 +2,14 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
 import { jsPDF } from "jspdf";
 
-function MeetingModal({ isOpen, onClose, meeting, children }) {
+function MeetingModal({ isOpen, onClose, meeting }) {
   const [showHistory, setShowHistory] = useState(false);
 
   if (!meeting) return null;
 
   const copyToClipboard = (text) => {
     navigator.clipboard.writeText(text);
+    alert("Copied to clipboard!");
   };
 
   const exportMarkdown = (title, summary) => {
@@ -17,7 +18,7 @@ function MeetingModal({ isOpen, onClose, meeting, children }) {
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.download = `${title}_version.md`;
+    link.download = `${title}_summary.md`;
     link.click();
   };
 
@@ -27,16 +28,27 @@ function MeetingModal({ isOpen, onClose, meeting, children }) {
     doc.text(title, 10, 10);
     doc.setFontSize(12);
     doc.text(summary, 10, 20);
-    doc.save(`${title}_version.pdf`);
+    doc.save(`${title}_summary.pdf`);
   };
 
   const restoreVersion = async (versionText) => {
-    await fetch(`/api/meetings/${meeting._id}/summary`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ summary: versionText }),
-    });
-    window.location.reload();
+    try {
+      const response = await fetch(`/api/meetings/${meeting._id}/summary`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ summary: versionText }),
+      });
+
+      if (response.ok) {
+        alert("Version restored successfully!");
+        window.location.reload();
+      } else {
+        alert("Failed to restore version.");
+      }
+    } catch (error) {
+      console.error("Error restoring version:", error);
+      alert("An error occurred while restoring the version.");
+    }
   };
 
   return (
@@ -59,9 +71,11 @@ function MeetingModal({ isOpen, onClose, meeting, children }) {
             style={styles.modal}
             onClick={(e) => e.stopPropagation()}
           >
-            <h2 style={styles.title}>{meeting.title}</h2>
+            <h2 style={styles.title}>{meeting.title || "Untitled Meeting"}</h2>
             <p style={styles.date}>
-              {new Date(meeting.uploadedAt).toLocaleString()}
+              {meeting.uploadedAt
+                ? new Date(meeting.uploadedAt).toLocaleString()
+                : "Date not available"}
             </p>
 
             <div style={styles.transcriptStyled}>
@@ -77,7 +91,20 @@ function MeetingModal({ isOpen, onClose, meeting, children }) {
               )}
             </div>
 
-            {children}
+            <div style={styles.actions}>
+              <button
+                onClick={() => exportPDF(meeting.title, meeting.summary)}
+                style={styles.actionButton}
+              >
+                Export PDF
+              </button>
+              <button
+                onClick={() => exportMarkdown(meeting.title, meeting.summary)}
+                style={styles.actionButton}
+              >
+                Export Markdown
+              </button>
+            </div>
 
             {Array.isArray(meeting.summaryHistory) &&
               meeting.summaryHistory.length > 0 && (
@@ -116,22 +143,6 @@ function MeetingModal({ isOpen, onClose, meeting, children }) {
                                 style={styles.historyActionButton}
                               >
                                 Copy
-                              </button>
-                              <button
-                                onClick={() =>
-                                  exportPDF(meeting.title, version)
-                                }
-                                style={styles.historyActionButton}
-                              >
-                                PDF
-                              </button>
-                              <button
-                                onClick={() =>
-                                  exportMarkdown(meeting.title, version)
-                                }
-                                style={styles.historyActionButton}
-                              >
-                                MD
                               </button>
                             </div>
                           </div>
@@ -196,15 +207,20 @@ const styles = {
     borderRadius: "10px",
     marginBottom: "1rem",
   },
-  button: {
+  actions: {
+    display: "flex",
+    gap: "1rem",
+    justifyContent: "center",
     marginTop: "1rem",
-    width: "100%",
-    padding: "0.6rem",
+  },
+  actionButton: {
+    padding: "0.5rem 1rem",
+    fontSize: "0.9rem",
+    borderRadius: "8px",
+    border: "none",
+    cursor: "pointer",
     backgroundColor: "#444",
     color: "#fff",
-    border: "none",
-    borderRadius: "8px",
-    cursor: "pointer",
   },
   historyToggle: {
     marginTop: "1rem",
@@ -241,6 +257,16 @@ const styles = {
     cursor: "pointer",
     backgroundColor: "#333",
     color: "#fff",
+  },
+  button: {
+    marginTop: "1rem",
+    width: "100%",
+    padding: "0.6rem",
+    backgroundColor: "#444",
+    color: "#fff",
+    border: "none",
+    borderRadius: "8px",
+    cursor: "pointer",
   },
 };
 

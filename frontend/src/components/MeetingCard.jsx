@@ -6,27 +6,33 @@ function MeetingCard({ meeting, onClick, index = 0 }) {
 
   const styles = {
     card: {
-      backgroundColor: "#1c1c1e",
+      backgroundColor: "#1e3a8a", // Set the box's background color
       color: "#fff",
-      borderRadius: "16px",
+      borderRadius: "10px",
       padding: "1rem",
-      width: "90%",
-      maxWidth: "360px",
+      width: "100px",
+      height: "100px",
       boxShadow: `
         0 4px 12px rgba(0, 0, 0, 0.3),
         0 0 10px rgba(0, 123, 255, 0.2)
       `,
       textAlign: "center",
       cursor: "pointer",
+      display: "flex",
+      flexDirection: "column",
+      justifyContent: "center",
+      alignItems: "center",
+      margin: "0 auto",
     },
     title: {
-      fontSize: "1.1rem",
+      fontSize: "1rem",
       fontWeight: 600,
       marginBottom: "0.3rem",
+      color: "#fff",
     },
     date: {
-      fontSize: "0.85rem",
-      color: "var(--text-muted)",
+      fontSize: "0.75rem",
+      color: "#ddd",
     },
   };
 
