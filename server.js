@@ -12,7 +12,25 @@ const MONGO_URI = process.env.MONGO_URI;
 
 // Middleware
 app.use(express.json()); // Parse JSON
-app.use(cors()); // Enable CORS
+const allowedOrigins = [
+  "http://localhost:5173", // local dev
+  "https://meetingtranscriber.vercel.app", // deployed frontend
+];
+
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      // allow requests with no origin (like mobile apps or curl)
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      } else {
+        return callback(new Error("CORS policy: Origin not allowed"));
+      }
+    },
+    credentials: true,
+  })
+);
 
 // Connect to MongoDB
 mongoose
