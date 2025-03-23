@@ -85,8 +85,8 @@ MeetingTranscriber helps you convert conversations into structured summaries usi
 
 **Viola Ranjha**
 - 🖥️ Full-Stack Developer | 💡 Creative Problem Solver | ☕ Coffee & Code Enthusiast
-- 📧 ranjha.viola@gmail.com
-- 🔗 https://vmr093.github.io/ViolaRanjha/
+- 📧 _ranjha.viola@gmail.com_
+- 🔗 _https://vmr093.github.io/ViolaRanjha/_
 
 
 
