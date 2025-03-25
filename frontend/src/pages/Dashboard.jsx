@@ -3,14 +3,12 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { motion } from "framer-motion";
-import { jsPDF } from "jspdf";
 
 import MeetingCard from "../components/MeetingCard";
 import MeetingModal from "../components/MeetingModal";
 import FloatingUploadButton from "../components/FloatingUploadButton";
 import UploadModal from "../components/UploadModal";
-
-const themeColors = ["#2d3a69", "#1e3a8a", "#2a4365", "#3c366b", "#1a365d"];
+import RecordModal from "../components/RecordModal"; // ✅ NEW IMPORT
 
 const styles = {
   container: {
@@ -61,10 +59,10 @@ const styles = {
     fontSize: "1rem",
   },
   meetingsContainer: {
-    display: "flex", // Ensure flexbox is enabled
-    flexDirection: "column", // Stack cards vertically
-    gap: "1rem", // Add spacing between cards
-    alignItems: "center", // Center cards horizontally (optional)
+    display: "flex",
+    flexDirection: "column",
+    gap: "1rem",
+    alignItems: "center",
     padding: "1rem",
     marginBottom: "7rem",
   },
@@ -101,6 +99,7 @@ function Dashboard() {
   const [meetings, setMeetings] = useState([]);
   const [selectedMeeting, setSelectedMeeting] = useState(null);
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+  const [isRecordModalOpen, setIsRecordModalOpen] = useState(false); // ✅ NEW STATE
   const [summary, setSummary] = useState("");
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -110,7 +109,7 @@ function Dashboard() {
 
   useEffect(() => {
     axios
-      .get(`${process.env.REACT_APP_API_BASE_URL}/api/meetings`) // Use environment variable
+      .get(`${import.meta.env.VITE_API_BASE_URL}/api/meetings`)
       .then((res) => {
         if (Array.isArray(res.data)) {
           setMeetings(res.data);
@@ -134,14 +133,6 @@ function Dashboard() {
     setSelectedMeeting(null);
     setSummary("");
     setLoading(false);
-  };
-
-  const handleUploadClick = () => {
-    setIsUploadModalOpen(true);
-  };
-
-  const closeUploadModal = () => {
-    setIsUploadModalOpen(false);
   };
 
   const handleLogout = () => {
@@ -182,7 +173,11 @@ function Dashboard() {
         ) : (
           <div style={styles.meetingsContainer}>
             {filteredMeetings.map((meeting, index) => (
-              <MeetingCard key={meeting._id} meeting={meeting} onClick={openModal} />
+              <MeetingCard
+                key={meeting._id}
+                meeting={meeting}
+                onClick={openModal}
+              />
             ))}
           </div>
         )}
@@ -190,7 +185,7 @@ function Dashboard() {
         <div
           style={styles.recordButton}
           title="Record"
-          onClick={() => toast("Recording feature coming soon!")}
+          onClick={() => setIsRecordModalOpen(true)}
         />
 
         <MeetingModal
@@ -200,9 +195,8 @@ function Dashboard() {
         >
           {selectedMeeting && (
             <>
-              {(!selectedMeeting.summary || selectedMeeting.summary === "") && (
+              {!selectedMeeting.summary && (
                 <button
-                  onClick={() => toast("Summary generation coming soon!")}
                   style={{
                     background: "#000",
                     color: "#fff",
@@ -211,6 +205,7 @@ function Dashboard() {
                     marginTop: "1rem",
                     cursor: "pointer",
                   }}
+                  onClick={() => toast("Summary feature coming soon!")}
                 >
                   Generate Summary
                 </button>
@@ -221,11 +216,18 @@ function Dashboard() {
 
         <UploadModal
           isOpen={isUploadModalOpen}
-          onClose={closeUploadModal}
+          onClose={() => setIsUploadModalOpen(false)}
           userId={userId}
           onUploadComplete={(newMeeting) => {
             setMeetings((prev) => [newMeeting, ...prev]);
-            closeUploadModal();
+          }}
+        />
+
+        <RecordModal
+          isOpen={isRecordModalOpen}
+          onClose={() => setIsRecordModalOpen(false)}
+          onRecordingComplete={(newMeeting) => {
+            setMeetings((prev) => [newMeeting, ...prev]);
           }}
         />
 

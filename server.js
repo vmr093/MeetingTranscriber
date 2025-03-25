@@ -48,13 +48,23 @@ const authRoutes = require("./routes/authRoutes");
 app.use("/api/auth", authRoutes);
 
 const uploadRoutes = require("./routes/uploadRoutes");
-app.use("/api/upload", uploadRoutes);
+app.use("/api/upload", uploadRoutes); // keep for manual uploads
 
 const meetingRoutes = require("./routes/meetingRoutes");
 app.use("/api/meetings", meetingRoutes);
 
 const summarizeRoute = require("./routes/summarize");
 app.use("/api/summarize", summarizeRoute);
+
+// 🆕 Use this for recorded audio + transcription
+const uploadRecordRoute = require("./routes/uploadRecordRoute");
+app.use("/api/record", uploadRecordRoute);
+
+// Optional: recordings management (if you want it later)
+const recordRoutes = require("./routes/recordRoutes");
+app.use("/api/recordings", recordRoutes);
+
+
 
 
 

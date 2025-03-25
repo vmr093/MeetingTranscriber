@@ -7,7 +7,6 @@ const MeetingSchema = new mongoose.Schema({
   transcript: { type: String }, // 👈 Add this
   uploadedAt: { type: Date, default: Date.now },
   summary: { type: String, default: "" },
-  summary: {type: String, default: "",},
   summaryHistory: {type: [String], default: [],},
 });
 

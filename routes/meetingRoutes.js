@@ -52,4 +52,26 @@ router.get("/:id", async (req, res) => {
   }
 });
 
+// POST /api/meetings/start-recording - Create new meeting placeholder
+router.post("/start-recording", async (req, res) => {
+  const { title, userId } = req.body;
+
+  if (!title || !userId) {
+    return res.status(400).json({ message: "Title and userId are required" });
+  }
+
+  try {
+    const newMeeting = await Meeting.create({
+      title,
+      user: userId,
+      audioPath: "placeholder-recording.mp3", // Will be replaced by real audio file
+    });
+
+    res.status(201).json(newMeeting);
+  } catch (err) {
+    console.error("❌ Failed to start recording:", err);
+    res.status(500).json({ message: "Server error while starting recording" });
+  }
+});
+
 module.exports = router;
