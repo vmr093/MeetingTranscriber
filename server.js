@@ -13,23 +13,24 @@ const MONGO_URI = process.env.MONGO_URI;
 // Middleware
 
 const allowedOrigins = [
-  "http://localhost:5173",
-  "https://meetingtranscriber.vercel.app",
-  "https://meeting-transcriber-onbqpsssf-vmr093s-projects.vercel.app",
+  "http://localhost:5173", // local dev
+  "https://meeting-transcriber.vercel.app", // deployed frontend
 ];
 
-const corsOptions = {
-  origin: (origin, callback) => {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error("CORS not allowed"));
-    }
-  },
-  credentials: true,
-};
 
-app.use(cors(corsOptions));
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      } else {
+        return callback(new Error("CORS policy: Origin not allowed"));
+      }
+    },
+    credentials: true,
+  })
+);
+
 
 
 // Connect to MongoDB
