@@ -107,7 +107,7 @@ export default function Landing() {
       margin: "0 auto",
     },
     illustration: {
-      width: "250px",
+      width: "600px",
       maxWidth: "100%",
       marginBottom: "5rem",
     },

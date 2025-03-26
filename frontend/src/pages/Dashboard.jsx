@@ -112,6 +112,7 @@ const styles = {
 };
 
 function Dashboard() {
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [meetings, setMeetings] = useState([]);
   const [selectedMeeting, setSelectedMeeting] = useState(null);
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
