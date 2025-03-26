@@ -226,7 +226,7 @@ function Dashboard() {
         <RecordModal
           isOpen={isRecordModalOpen}
           onClose={() => setIsRecordModalOpen(false)}
-          onRecordingComplete={(newMeeting) => {
+          onUploadComplete={(newMeeting) => {
             setMeetings((prev) => [newMeeting, ...prev]);
           }}
         />

@@ -9,9 +9,6 @@ function RecordModal({ isOpen, onClose, onUploadComplete }) {
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
 
-  const auth = getAuth();
-  const userId = auth.currentUser?.uid;
-
   const handleStartRecording = async () => {
     if (!title.trim()) {
       toast.error("Please enter a meeting title");
@@ -21,59 +18,61 @@ function RecordModal({ isOpen, onClose, onUploadComplete }) {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       const mediaRecorder = new MediaRecorder(stream);
+      mediaRecorderRef.current = mediaRecorder;
       audioChunksRef.current = [];
 
       mediaRecorder.ondataavailable = (event) => {
         audioChunksRef.current.push(event.data);
       };
 
-      mediaRecorderRef.current = mediaRecorder;
+      mediaRecorder.onstop = async () => {
+        const blob = new Blob(audioChunksRef.current, { type: "audio/webm" });
+        const formData = new FormData();
+        formData.append("audio", blob, `${title}.webm`);
+        formData.append("title", title);
+
+        const auth = getAuth();
+        const userId = auth.currentUser?.uid;
+        formData.append("userId", userId);
+
+        try {
+          const res = await fetch(
+            `${import.meta.env.VITE_API_BASE_URL}/api/record/upload`,
+            {
+              method: "POST",
+              body: formData,
+            }
+          );
+
+          const data = await res.json();
+
+          if (res.ok) {
+            toast.success("Meeting uploaded and transcribed!");
+            onUploadComplete(data);
+            onClose();
+          } else {
+            toast.error(data.message || "Upload failed");
+          }
+        } catch (err) {
+          console.error("Upload error:", err);
+          toast.error("Upload error. See console.");
+        }
+      };
+
       mediaRecorder.start();
       setRecording(true);
-      toast.success("Recording started");
+      toast("Recording started");
     } catch (err) {
       console.error("Mic access denied or failed:", err);
       toast.error("Mic access denied");
     }
   };
 
-  const handleStopRecording = async () => {
-    if (!mediaRecorderRef.current) return;
-
-    mediaRecorderRef.current.stop();
-    setRecording(false);
-
-    mediaRecorderRef.current.onstop = async () => {
-      const blob = new Blob(audioChunksRef.current, { type: "audio/webm" });
-
-      const formData = new FormData();
-      formData.append("audio", blob, `${title}.webm`);
-      formData.append("title", title);
-      formData.append("userId", userId);
-
-      try {
-        const res = await fetch(
-          `${import.meta.env.VITE_API_BASE_URL}/api/record/upload`,
-          {
-            method: "POST",
-            body: formData,
-          }
-        );
-
-        const data = await res.json();
-
-        if (res.ok) {
-          toast.success("Recording uploaded and transcribed!");
-          onUploadComplete(data);
-          onClose();
-        } else {
-          toast.error(data.message || "Upload failed");
-        }
-      } catch (err) {
-        console.error("Upload error:", err);
-        toast.error("Upload error. See console.");
-      }
-    };
+  const handleStopRecording = () => {
+    if (mediaRecorderRef.current) {
+      mediaRecorderRef.current.stop();
+      setRecording(false);
+    }
   };
 
   const styles = {
