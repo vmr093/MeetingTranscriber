@@ -4,6 +4,7 @@ import Landing from "./pages/Landing";
 import Login from "./pages/login";
 import Signup from "./pages/signup";
 import PrivateRoute from "./components/PrivateRoute";
+import MyMeetings from "./pages/MyMeetings";
 
 function App() {
   return (
@@ -12,7 +13,20 @@ function App() {
         <Route path="/" element={<Landing />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
-        <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>
+        <Route
+          path="/dashboard"
+          element={
+            <PrivateRoute>
+              <Dashboard />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/meetings"
+          element={
+            <PrivateRoute>
+              <MyMeetings />
+            </PrivateRoute>
           }
         />
       </Routes>
