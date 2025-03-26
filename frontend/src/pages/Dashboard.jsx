@@ -48,7 +48,8 @@ const styles = {
     marginBottom: "1rem",
   },
   search: {
-    marginBottom: "1.5rem",
+    display: "block",
+    margin: "0 auto 1rem",
     padding: "0.2rem 1rem",
     borderRadius: "8px",
     border: "1px solid #444",
@@ -57,7 +58,9 @@ const styles = {
     background: "#111",
     color: "#fff",
     fontSize: "1rem",
+
   },
+
   meetingsContainer: {
     display: "flex",
     flexDirection: "column",
@@ -65,6 +68,7 @@ const styles = {
     alignItems: "center",
     padding: "1rem",
     marginBottom: "7rem",
+    marginTop: "rem",
   },
   empty: {
     color: "var(--text-muted)",
@@ -93,19 +97,35 @@ const styles = {
     cursor: "pointer",
     boxShadow: "0 0 12px rgba(255, 77, 77, 0.5)",
   },
+
+  deleteButton: {
+    backgroundColor: "rgba(220, 53, 69, 0.7)", // red
+    color: "#fff",
+    border: "none",
+    padding: "0.3rem 0.8rem",
+    borderRadius: "10px",
+    cursor: "pointer",
+    margin: "0.5rem",
+    fontWeight: "bold",
+    boxShadow: "0 4px 10px rgba(0, 0, 0, 0.2)",
+  },
 };
 
 function Dashboard() {
   const [meetings, setMeetings] = useState([]);
   const [selectedMeeting, setSelectedMeeting] = useState(null);
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
-  const [isRecordModalOpen, setIsRecordModalOpen] = useState(false); // ✅ NEW STATE
+  const [isRecordModalOpen, setIsRecordModalOpen] = useState(false);
   const [summary, setSummary] = useState("");
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
+  const [selectedForDelete, setSelectedForDelete] = useState([]);
+  const [showDeleteMode, setShowDeleteMode] = useState(false);
 
   const userId = "YOUR_USER_ID_HERE";
+
+  
 
   useEffect(() => {
     axios
@@ -141,6 +161,36 @@ function Dashboard() {
     navigate("/login");
   };
 
+  const handleToggleSelect = (meetingId) => {
+    setSelectedForDelete((prev) =>
+      prev.includes(meetingId)
+        ? prev.filter((id) => id !== meetingId)
+        : [...prev, meetingId]
+    );
+  };
+
+  const handleDeleteSelected = async () => {
+    if (selectedForDelete.length === 0) {
+      toast.error("No meetings selected.");
+      return;
+    }
+
+    try {
+      await Promise.all(
+        selectedForDelete.map((id) =>
+          axios.delete(`${import.meta.env.VITE_API_BASE_URL}/api/meetings/${id}`)
+        )
+      );
+      toast.success("Selected meetings deleted.");
+      setMeetings((prev) => prev.filter((m) => !selectedForDelete.includes(m._id)));
+      setSelectedForDelete([]);
+      setShowDeleteMode(false);
+    } catch (error) {
+      console.error("Batch delete failed:", error);
+      toast.error("Error deleting meetings.");
+    }
+  };
+
   const filteredMeetings = meetings.filter((meeting) =>
     meeting.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -160,6 +210,8 @@ function Dashboard() {
       <div style={styles.container}>
         <h1 style={styles.header}>My Meetings</h1>
 
+        <div style={{ marginBottom: "1.5rem" }}></div>
+
         <input
           type="text"
           placeholder="Search meetings..."
@@ -168,16 +220,69 @@ function Dashboard() {
           style={styles.search}
         />
 
+        {/* 🗑️ Batch Delete Toggle */}
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          style={{
+            ...styles.logout,
+            backgroundColor: showDeleteMode
+              ? "rgba(220, 53, 69, 0.7)"
+              : "rgba(255, 255, 255, 0.05)",
+          }}
+          onClick={() => setShowDeleteMode((prev) => !prev)}
+        >
+          {showDeleteMode ? "Cancel Delete" : "Delete Meetings"}
+        </motion.button>
+
+        {showDeleteMode && (
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            style={{
+              ...styles.logout,
+              backgroundColor: "rgba(220, 53, 69, 0.9)",
+              fontWeight: "bold",
+            }}
+            onClick={handleDeleteSelected}
+          >
+            Confirm Delete ({selectedForDelete.length})
+          </motion.button>
+        )}
+
         {filteredMeetings.length === 0 ? (
           <p style={styles.empty}>No meetings found.</p>
         ) : (
           <div style={styles.meetingsContainer}>
-            {filteredMeetings.map((meeting, index) => (
-              <MeetingCard
+            {filteredMeetings.map((meeting) => (
+              <div
                 key={meeting._id}
-                meeting={meeting}
-                onClick={openModal}
-              />
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  width: "100%",
+                  gap: "0.1rem", // adds spacing between checkbox and card
+                }}
+              >
+                {showDeleteMode && (
+                  <input
+                    type="checkbox"
+                    checked={selectedForDelete.includes(meeting._id)}
+                    onChange={() => handleToggleSelect(meeting._id)}
+                    style={{
+                      transform: "scale(1.4)",
+                      cursor: "pointer",
+                      marginLeft: "0.25rem",
+                    }}
+                  />
+                )}
+                <div
+                  style={{ flex: 1 }}
+                  onClick={() => !showDeleteMode && openModal(meeting)}
+                >
+                  <MeetingCard meeting={meeting} />
+                </div>
+              </div>
             ))}
           </div>
         )}

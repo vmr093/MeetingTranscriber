@@ -74,4 +74,18 @@ router.post("/start-recording", async (req, res) => {
   }
 });
 
+// ✅ DELETE /api/meetings/:id - Delete a meeting
+router.delete("/:id", async (req, res) => {
+  try {
+    const deleted = await Meeting.findByIdAndDelete(req.params.id);
+    if (!deleted) {
+      return res.status(404).json({ message: "Meeting not found" });
+    }
+    res.json({ message: "Meeting deleted", deleted });
+  } catch (err) {
+    console.error("Failed to delete meeting:", err);
+    res.status(500).json({ message: "Error deleting meeting" });
+  }
+});
+
 module.exports = router;
