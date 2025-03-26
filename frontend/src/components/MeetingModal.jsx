@@ -1,22 +1,27 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { jsPDF } from "jspdf";
 
 function MeetingModal({ isOpen, onClose, meeting }) {
-  const [sections, setSections] = useState([
-    { title: "Meeting Overview", content: ["A short high-level summary of what the meeting was about."] },
-    { title: "Key Decisions", content: ["What was agreed upon? Any final calls or choices made?"] },
-    { title: "Action Items", content: ["A bulleted list of assigned tasks, who’s responsible, and deadlines (if mentioned)."] },
-    { title: "Discussion Highlights", content: ["Notable talking points, questions raised, or challenges discussed."] },
-    { title: "Next Steps", content: ["What’s happening after this meeting? Any follow-ups or planned dates?"] },
-    { title: "Questions & Concerns", content: ["Any unresolved issues or items that require clarification."] },
-    { title: "Attendees (Optional)", content: ["Who was present (if the transcript includes names or roles)."] },
-  ]);
+  const [sections, setSections] = useState([]);
+  const [mode, setMode] = useState(null);
+  const [newSectionName, setNewSectionName] = useState("");
+  const [selectedSectionToRemove, setSelectedSectionToRemove] = useState(null);
+  const [showHistory, setShowHistory] = useState(false);
 
-  const [mode, setMode] = useState(null); // Modes: "remove", "add", "edit"
-  const [newSectionName, setNewSectionName] = useState(""); // For adding a new section
-  const [selectedSectionToRemove, setSelectedSectionToRemove] = useState(null); // For removing a section
-  const [showHistory, setShowHistory] = useState(false); // For version control
+  useEffect(() => {
+    if (meeting?.summary) {
+      const parsedSections = meeting.summary.split("\n\n").map((block) => {
+        const lines = block.trim().split("\n");
+        const title = lines[0]?.replace(/^#+\s*/, "").trim();
+        const content = lines
+          .slice(1)
+          .map((line) => line.replace(/^[-*•]\s*/, "").trim());
+        return { title, content };
+      });
+      setSections(parsedSections);
+    }
+  }, [meeting]);
 
   const addSection = (name) => {
     const newSection = { title: name, content: [] };
@@ -54,11 +59,14 @@ function MeetingModal({ isOpen, onClose, meeting }) {
 
   const restoreVersion = async (versionText) => {
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/meetings/${meeting._id}/summary`, { // Use environment variable
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ summary: versionText }),
-      });
+      const response = await fetch(
+        `${process.env.REACT_APP_API_BASE_URL}/api/meetings/${meeting._id}/summary`,
+        {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ summary: versionText }),
+        }
+      );
 
       if (response.ok) {
         alert("Version restored successfully!");
@@ -101,20 +109,27 @@ function MeetingModal({ isOpen, onClose, meeting }) {
                 : "Date not available"}
             </p>
 
-            {/* Button Row */}
             <div style={styles.buttonRow}>
-              <button onClick={() => setMode("remove")} style={styles.actionButton}>
+              <button
+                onClick={() => setMode("remove")}
+                style={styles.actionButton}
+              >
                 Remove
               </button>
-              <button onClick={() => setMode("add")} style={styles.actionButton}>
+              <button
+                onClick={() => setMode("add")}
+                style={styles.actionButton}
+              >
                 Add Section
               </button>
-              <button onClick={() => setMode("edit")} style={styles.actionButton}>
+              <button
+                onClick={() => setMode("edit")}
+                style={styles.actionButton}
+              >
                 Edit
               </button>
             </div>
 
-            {/* Remove Mode */}
             {mode === "remove" && (
               <div>
                 {sections.map((section, index) => (
@@ -124,7 +139,9 @@ function MeetingModal({ isOpen, onClose, meeting }) {
                         type="radio"
                         name="removeSection"
                         value={index}
-                        onChange={(e) => setSelectedSectionToRemove(Number(e.target.value))}
+                        onChange={(e) =>
+                          setSelectedSectionToRemove(Number(e.target.value))
+                        }
                       />
                       {section.title}
                     </label>
@@ -134,20 +151,22 @@ function MeetingModal({ isOpen, onClose, meeting }) {
                   onClick={() => {
                     if (selectedSectionToRemove !== null) {
                       removeSection(selectedSectionToRemove);
-                      setMode(null); // Exit remove mode
+                      setMode(null);
                     }
                   }}
                   style={styles.confirmButton}
                 >
                   Confirm Remove
                 </button>
-                <button onClick={() => setMode(null)} style={styles.cancelButton}>
+                <button
+                  onClick={() => setMode(null)}
+                  style={styles.cancelButton}
+                >
                   Cancel
                 </button>
               </div>
             )}
 
-            {/* Add Section Mode */}
             {mode === "add" && (
               <div style={styles.addSectionModal}>
                 <h4>Enter New Section Name</h4>
@@ -161,21 +180,23 @@ function MeetingModal({ isOpen, onClose, meeting }) {
                   onClick={() => {
                     if (newSectionName.trim()) {
                       addSection(newSectionName);
-                      setNewSectionName(""); // Clear input
-                      setMode(null); // Exit add mode
+                      setNewSectionName("");
+                      setMode(null);
                     }
                   }}
                   style={styles.confirmButton}
                 >
                   Add Section
                 </button>
-                <button onClick={() => setMode(null)} style={styles.cancelButton}>
+                <button
+                  onClick={() => setMode(null)}
+                  style={styles.cancelButton}
+                >
                   Cancel
                 </button>
               </div>
             )}
 
-            {/* Edit Mode */}
             {sections.map((section, index) => (
               <div key={index} style={styles.section}>
                 <h4>{section.title}</h4>
@@ -191,8 +212,11 @@ function MeetingModal({ isOpen, onClose, meeting }) {
                       placeholder="Add a bullet point"
                       onKeyDown={(e) => {
                         if (e.key === "Enter" && e.target.value.trim()) {
-                          updateSectionContent(index, [...section.content, e.target.value.trim()]);
-                          e.target.value = ""; // Clear input
+                          updateSectionContent(index, [
+                            ...section.content,
+                            e.target.value.trim(),
+                          ]);
+                          e.target.value = "";
                         }
                       }}
                       style={styles.contentInput}
@@ -201,13 +225,13 @@ function MeetingModal({ isOpen, onClose, meeting }) {
                 )}
               </div>
             ))}
+
             {mode === "edit" && (
               <button onClick={() => setMode(null)} style={styles.cancelButton}>
                 Cancel
               </button>
             )}
 
-            {/* Export Buttons */}
             <div style={styles.actions}>
               <button
                 onClick={() => exportPDF(meeting.title, meeting.summary)}
@@ -223,7 +247,6 @@ function MeetingModal({ isOpen, onClose, meeting }) {
               </button>
             </div>
 
-            {/* Version Control */}
             {Array.isArray(meeting.summaryHistory) &&
               meeting.summaryHistory.length > 0 && (
                 <div style={{ marginTop: "1.5rem" }}>
@@ -257,7 +280,9 @@ function MeetingModal({ isOpen, onClose, meeting }) {
                                 Restore
                               </button>
                               <button
-                                onClick={() => navigator.clipboard.writeText(version)}
+                                onClick={() =>
+                                  navigator.clipboard.writeText(version)
+                                }
                                 style={styles.historyActionButton}
                               >
                                 Copy
@@ -304,48 +329,30 @@ const styles = {
     maxHeight: "75vh",
     overflowY: "auto",
     boxShadow: "0 8px 30px rgba(0,0,0,0.2)",
-    
   },
   title: {
     fontSize: "2rem",
     fontWeight: "bold",
     marginBottom: "1rem",
-    color: "#2d3a69", // Theme color for text
+    color: "#2d3a69",
     textAlign: "left",
   },
   date: {
     fontSize: "0.7rem",
-    color: "#2d3a69", // Theme color for text
+    color: "#2d3a69",
     marginBottom: "1.5rem",
     textAlign: "left",
   },
-  section: {
-    marginBottom: "1.5rem",
-    textAlign: "left", // Align sections to the left
-  },
-  sectionHeader: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: "0.5rem",
-  },
-  sectionTitleInput: {
-    fontSize: "1.2rem",
-    fontWeight: "bold",
-    border: "none",
-    background: "transparent",
-    color: "#1e3a8a", // Theme color for text
-    width: "80%",
-  },
+  section: { marginBottom: "1.5rem", textAlign: "left" },
   sectionContent: {
     listStyleType: "disc",
     paddingLeft: "1.5rem",
-    color: "#2d3a69", // Theme color for text
+    color: "#2d3a69",
   },
   contentInput: {
     border: "1px solid #ccc",
-    background: "rgba(255, 255, 255, 0.7)", // Frosted glass effect
-    color: "#2d3a69", // Theme color for text
+    background: "rgba(255, 255, 255, 0.7)",
+    color: "#2d3a69",
     width: "100%",
     padding: "0.5rem",
     borderRadius: "8px",
@@ -362,7 +369,7 @@ const styles = {
     borderRadius: "12px",
     border: "none",
     cursor: "pointer",
-    backgroundColor: "rgba(45, 58, 105, 0.7)", // Frosted glass effect with theme color
+    backgroundColor: "rgba(45, 58, 105, 0.7)",
     color: "#fff",
     backdropFilter: "blur(10px)",
     WebkitBackdropFilter: "blur(10px)",
@@ -371,38 +378,27 @@ const styles = {
   },
   confirmButton: {
     marginTop: "1rem",
-    padding: "0.4rem 1.2rem",
-    fontSize: "0.7rem",
-    borderRadius: "12px",
-    border: "none",
-    cursor: "pointer",
-    backgroundColor: "rgba(40, 167, 69, 0.7)", // Green frosted glass effect
+    backgroundColor: "green",
     color: "#fff",
-    backdropFilter: "blur(10px)",
-    WebkitBackdropFilter: "blur(10px)",
-    transition: "all 0.3s ease",
-    boxShadow: "0 4px 10px rgba(0, 0, 0, 0.2)",
+    padding: "0.5rem 1rem",
+    border: "none",
+    borderRadius: "10px",
+    cursor: "pointer",
   },
   cancelButton: {
     marginTop: "1rem",
-    padding: "0.4rem 1.2rem",
-    fontSize: "0.7rem",
-    borderRadius: "12px",
+    backgroundColor: "#ccc",
+    color: "#000",
+    padding: "0.5rem 1rem",
     border: "none",
+    borderRadius: "10px",
     cursor: "pointer",
-    backgroundColor: "rgba(220, 53, 69, 0.7)", // Red frosted glass effect
-    color: "#fff",
-    backdropFilter: "blur(10px)",
-    WebkitBackdropFilter: "blur(10px)",
-    transition: "all 0.3s ease",
-    boxShadow: "0 4px 10px rgba(0, 0, 0, 0.2)",
   },
   addSectionModal: {
     backgroundColor: "#2d3a69",
-    padding: "1.5rem",
+    padding: "1rem",
     borderRadius: "12px",
-    boxShadow: "0 4px 12px rgba(0, 0, 0, 0.2)",
-    textAlign: "center",
+    color: "#fff",
   },
   input: {
     width: "80%",
@@ -410,8 +406,8 @@ const styles = {
     marginBottom: "1rem",
     borderRadius: "8px",
     border: "1px solid #ccc",
-    background: "rgba(255, 255, 255, 0.7)", // Frosted glass effect
-    color: "rgba(45, 58, 105, 0.7)", // Theme color for text
+    background: "rgba(255, 255, 255, 0.7)",
+    color: "rgba(45, 58, 105, 0.7)",
   },
   actions: {
     display: "flex",
@@ -426,12 +422,8 @@ const styles = {
     borderRadius: "12px",
     cursor: "pointer",
     fontWeight: "bold",
-    backgroundColor: "rgba(45, 58, 105, 0.7)", // Theme color frosted glass
+    backgroundColor: "rgba(45, 58, 105, 0.7)",
     color: "#fff",
-    backdropFilter: "blur(10px)",
-    WebkitBackdropFilter: "blur(10px)",
-    transition: "all 0.3s ease",
-    boxShadow: "0 4px 10px rgba(0, 0, 0, 0.2)",
   },
   historyContainer: {
     marginTop: "1rem",
@@ -440,19 +432,16 @@ const styles = {
     border: "1px solid #ddd",
     borderRadius: "8px",
     padding: "0.5rem",
-    backgroundColor: "rgba(255, 255, 255, 0.85)", // Frosted glass effect
+    backgroundColor: "rgba(255, 255, 255, 0.85)",
   },
-  historyBlock: {
-    marginBottom: "1rem",
-    textAlign: "left", // Align history blocks to the left
-  },
+  historyBlock: { marginBottom: "1rem", textAlign: "left" },
   historyText: {
     whiteSpace: "pre-wrap",
-    backgroundColor: "rgba(238, 238, 238, 0.85)", // Frosted glass effect
+    backgroundColor: "rgba(238, 238, 238, 0.85)",
     padding: "0.5rem",
     borderRadius: "6px",
     fontSize: "0.95rem",
-    color: "#2d3a69", // Theme color for text
+    color: "#2d3a69",
   },
   historyActionButton: {
     padding: "0.4rem 0.8rem",
@@ -460,12 +449,8 @@ const styles = {
     borderRadius: "8px",
     border: "none",
     cursor: "pointer",
-    backgroundColor: "rgba(45, 58, 105, 0.7)", // Theme color frosted glass
+    backgroundColor: "rgba(45, 58, 105, 0.7)",
     color: "#fff",
-    backdropFilter: "blur(10px)",
-    WebkitBackdropFilter: "blur(10px)",
-    transition: "all 0.3s ease",
-    boxShadow: "0 4px 10px rgba(0, 0, 0, 0.2)",
   },
   button: {
     marginTop: "1rem",
@@ -474,12 +459,8 @@ const styles = {
     borderRadius: "12px",
     border: "none",
     cursor: "pointer",
-    backgroundColor: "rgba(45, 58, 105, 0.7)", // Theme color frosted glass
+    backgroundColor: "rgba(45, 58, 105, 0.7)",
     color: "#fff",
-    backdropFilter: "blur(10px)",
-    WebkitBackdropFilter: "blur(10px)",
-    transition: "all 0.3s ease",
-    boxShadow: "0 4px 10px rgba(0, 0, 0, 0.2)",
   },
 };
 
