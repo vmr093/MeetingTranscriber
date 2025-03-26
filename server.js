@@ -13,9 +13,11 @@ const MONGO_URI = process.env.MONGO_URI;
 // Middleware
 
 const allowedOrigins = [
-  "http://localhost:5173", // local dev
-  "https://meeting-transcriber.vercel.app", // deployed frontend
+  "http://localhost:5173", // dev
+  "https://meeting-transcriber.vercel.app", // custom domain (your final domain)
+  "https://meeting-transcriber-onbqpsssf-vmr093s-projects.vercel.app", // temporary Vercel preview domain
 ];
+
 
 
 app.use(

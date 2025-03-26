@@ -1,6 +1,7 @@
 import { useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import toast from "react-hot-toast";
+import { getAuth } from "firebase/auth";
 
 function RecordModal({ isOpen, onClose, onUploadComplete }) {
   const [title, setTitle] = useState("");
@@ -24,36 +25,6 @@ function RecordModal({ isOpen, onClose, onUploadComplete }) {
         audioChunksRef.current.push(event.data);
       };
 
-      mediaRecorder.onstop = async () => {
-        const blob = new Blob(audioChunksRef.current, { type: "audio/webm" });
-        const formData = new FormData();
-        formData.append("audio", blob, `${title}.webm`);
-        formData.append("title", title);
-
-        try {
-          const res = await fetch(
-            `${import.meta.env.VITE_API_BASE_URL}/api/record/upload`,
-            {
-              method: "POST",
-              body: formData,
-            }
-          );
-
-          const data = await res.json();
-
-          if (res.ok) {
-            toast.success("Meeting uploaded and transcribed!");
-            onUploadComplete(data); // Show new meeting in dashboard
-            onClose(); // Close modal
-          } else {
-            toast.error(data.error || "Upload failed");
-          }
-        } catch (error) {
-          console.error("Upload error:", error);
-          toast.error("An error occurred");
-        }
-      };
-
       mediaRecorder.start();
       setRecording(true);
       toast("Recording started");
@@ -63,15 +34,48 @@ function RecordModal({ isOpen, onClose, onUploadComplete }) {
     }
   };
 
-  const handleStopRecording = () => {
-    if (
-      mediaRecorderRef.current &&
-      mediaRecorderRef.current.state === "recording"
-    ) {
-      mediaRecorderRef.current.stop();
-      setRecording(false);
-      toast("Recording stopped");
-    }
+  const handleStopRecording = async () => {
+    if (!mediaRecorderRef.current) return;
+
+    const recorder = mediaRecorderRef.current;
+
+    recorder.onstop = async () => {
+      const blob = new Blob(audioChunksRef.current, { type: "audio/webm" });
+
+      const auth = getAuth();
+      const userId = auth.currentUser?.uid;
+
+      const formData = new FormData();
+      formData.append("audio", blob, `${title}.webm`);
+      formData.append("title", title);
+      formData.append("userId", userId); // ✅ Add userId here
+
+      try {
+        const res = await fetch(
+          `${import.meta.env.VITE_API_BASE_URL}/api/record/upload`,
+          {
+            method: "POST",
+            body: formData,
+          }
+        );
+
+        const data = await res.json();
+
+        if (res.ok) {
+          toast.success("Recording uploaded and transcribed!");
+          onUploadComplete(data);
+          onClose();
+        } else {
+          toast.error(data.message || "Upload failed");
+        }
+      } catch (err) {
+        console.error("Upload error:", err);
+        toast.error("Upload error. See console.");
+      }
+    };
+
+    recorder.stop();
+    setRecording(false);
   };
 
   const styles = {

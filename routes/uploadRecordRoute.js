@@ -28,6 +28,10 @@ router.post("/upload", upload.single("audio"), async (req, res) => {
       return res.status(400).json({ error: "No audio file uploaded" });
     }
 
+    if (!userId) {
+      return res.status(400).json({ error: "Missing userId" });
+    }
+
     const newMeeting = new Meeting({
       title,
       user: userId,
