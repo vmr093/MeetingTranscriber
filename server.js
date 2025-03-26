@@ -12,29 +12,18 @@ const MONGO_URI = process.env.MONGO_URI;
 
 // Middleware
 
-const allowedOrigins = [
-  "http://localhost:5173", // dev
-  "https://meeting-transcriber.vercel.app", // custom domain (your final domain)
-  "https://meeting-transcriber-onbqpsssf-vmr093s-projects.vercel.app", // temporary Vercel preview domain
-];
-
-
-
 app.use(
   cors({
-    origin: function (origin, callback) {
-      if (!origin || allowedOrigins.includes(origin)) {
-        return callback(null, true);
-      } else {
-        return callback(new Error("CORS policy: Origin not allowed"));
-      }
-    },
+    origin: [
+      "http://localhost:5173",
+      "https://meeting-transcriber.vercel.app",
+      "https://meeting-transcriber-onbqpsssf-vmr093s-projects.vercel.app",
+    ],
     credentials: true,
   })
 );
-
-
-
+ 
+ 
 // Connect to MongoDB
 mongoose
   .connect(MONGO_URI)

@@ -9,6 +9,9 @@ function RecordModal({ isOpen, onClose, onUploadComplete }) {
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
 
+  const auth = getAuth();
+  const userId = auth.currentUser?.uid;
+
   const handleStartRecording = async () => {
     if (!title.trim()) {
       toast.error("Please enter a meeting title");
@@ -18,16 +21,16 @@ function RecordModal({ isOpen, onClose, onUploadComplete }) {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       const mediaRecorder = new MediaRecorder(stream);
-      mediaRecorderRef.current = mediaRecorder;
       audioChunksRef.current = [];
 
       mediaRecorder.ondataavailable = (event) => {
         audioChunksRef.current.push(event.data);
       };
 
+      mediaRecorderRef.current = mediaRecorder;
       mediaRecorder.start();
       setRecording(true);
-      toast("Recording started");
+      toast.success("Recording started");
     } catch (err) {
       console.error("Mic access denied or failed:", err);
       toast.error("Mic access denied");
@@ -37,18 +40,16 @@ function RecordModal({ isOpen, onClose, onUploadComplete }) {
   const handleStopRecording = async () => {
     if (!mediaRecorderRef.current) return;
 
-    const recorder = mediaRecorderRef.current;
+    mediaRecorderRef.current.stop();
+    setRecording(false);
 
-    recorder.onstop = async () => {
+    mediaRecorderRef.current.onstop = async () => {
       const blob = new Blob(audioChunksRef.current, { type: "audio/webm" });
-
-      const auth = getAuth();
-      const userId = auth.currentUser?.uid;
 
       const formData = new FormData();
       formData.append("audio", blob, `${title}.webm`);
       formData.append("title", title);
-      formData.append("userId", userId); // ✅ Add userId here
+      formData.append("userId", userId);
 
       try {
         const res = await fetch(
@@ -73,9 +74,6 @@ function RecordModal({ isOpen, onClose, onUploadComplete }) {
         toast.error("Upload error. See console.");
       }
     };
-
-    recorder.stop();
-    setRecording(false);
   };
 
   const styles = {
