@@ -5,6 +5,7 @@ import Login from "./pages/login";
 import Signup from "./pages/signup";
 import PrivateRoute from "./components/PrivateRoute";
 import MyMeetings from "./pages/MyMeetings";
+import Favorites from "./pages/Favorites";
 
 function App() {
   return (
@@ -29,6 +30,14 @@ function App() {
             </PrivateRoute>
           }
         />
+        <Route
+          path="/favorites"
+          element={
+            <PrivateRoute>
+              <Favorites />
+            </PrivateRoute>
+          }
+          />
       </Routes>
     </Router>
   );

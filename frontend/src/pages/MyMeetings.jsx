@@ -20,38 +20,39 @@ const styles = {
     marginBottom: "1.5rem",
     color: "#fff",
   },
+  controlsRow: {
+    display: "flex",
+    justifyContent: "center",
+    gap: "1rem",
+    flexWrap: "wrap",
+    alignItems: "center",
+    marginBottom: "1.5rem",
+  },
   search: {
-    display: "block",
-    margin: "0 auto 1rem",
-    padding: "0.1rem 1rem",
+    padding: "0.4rem 1rem",
     borderRadius: "8px",
     border: "1px solid #444",
-    width: "80%",
-    maxWidth: "150px",
     background: "#111",
     color: "#fff",
     fontSize: "1rem",
   },
-  meetingsContainer: {
-    display: "flex",
-    flexDirection: "column",
-    gap: "1rem",
-    alignItems: "center",
-    padding: "1rem 0",
-  },
-  empty: {
-    color: "var(--text-muted)",
-    fontStyle: "italic",
+  dropdown: {
+    padding: "0.2rem 1rem",
+    borderRadius: "8px",
+    border: "1px solid #444",
+    background: "#111",
+    color: "#fff",
+    fontSize: "1rem",
+    cursor: "pointer",
   },
   deleteToggle: {
     backgroundColor: "rgba(255, 255, 255, 0.05)",
     color: "#fff",
     border: "1px solid rgba(255, 255, 255, 0.2)",
-    padding: "0.4rem 1.2rem",
+    padding: "0.1rem 1rem",
     borderRadius: "12px",
     cursor: "pointer",
     fontWeight: "bold",
-    marginBottom: "1rem",
     backdropFilter: "blur(10px)",
     WebkitBackdropFilter: "blur(10px)",
     transition: "all 0.3s ease",
@@ -67,6 +68,17 @@ const styles = {
     cursor: "pointer",
     boxShadow: "0 4px 10px rgba(0, 0, 0, 0.2)",
   },
+  meetingsContainer: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "1rem",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  empty: {
+    color: "var(--text-muted)",
+    fontStyle: "italic",
+  },
 };
 
 function MyMeetings() {
@@ -75,6 +87,7 @@ function MyMeetings() {
   const [selectedMeeting, setSelectedMeeting] = useState(null);
   const [selectedForDelete, setSelectedForDelete] = useState([]);
   const [showDeleteMode, setShowDeleteMode] = useState(false);
+  const [sortOption, setSortOption] = useState("newest");
 
   useEffect(() => {
     axios
@@ -94,6 +107,21 @@ function MyMeetings() {
     );
   };
 
+  const handleToggleFavorite = async (meetingId) => {
+    try {
+      const res = await axios.patch(
+        `${import.meta.env.VITE_API_BASE_URL}/api/meetings/${meetingId}/favorite`
+      );
+      const updated = res.data;
+      setMeetings((prev) =>
+        prev.map((m) => (m._id === updated._id ? updated : m))
+      );
+    } catch (err) {
+      toast.error("Failed to toggle favorite");
+      console.error(err);
+    }
+  };
+
   const handleDeleteSelected = async () => {
     if (selectedForDelete.length === 0) {
       toast.error("No meetings selected.");
@@ -103,9 +131,7 @@ function MyMeetings() {
     try {
       await Promise.all(
         selectedForDelete.map((id) =>
-          axios.delete(
-            `${import.meta.env.VITE_API_BASE_URL}/api/meetings/${id}`
-          )
+          axios.delete(`${import.meta.env.VITE_API_BASE_URL}/api/meetings/${id}`)
         )
       );
       toast.success("Selected meetings deleted.");
@@ -120,32 +146,58 @@ function MyMeetings() {
     }
   };
 
-  const filteredMeetings = meetings.filter((meeting) =>
-    meeting.title.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredMeetings = meetings
+    .filter((meeting) =>
+      meeting.title.toLowerCase().includes(searchTerm.toLowerCase())
+    )
+    .sort((a, b) => {
+      if (sortOption === "newest") {
+        return new Date(b.uploadedAt) - new Date(a.uploadedAt);
+      } else if (sortOption === "oldest") {
+        return new Date(a.uploadedAt) - new Date(b.uploadedAt);
+      } else if (sortOption === "title-az") {
+        return a.title.localeCompare(b.title);
+      } else if (sortOption === "title-za") {
+        return b.title.localeCompare(a.title);
+      }
+      return 0;
+    });
 
   return (
     <>
-      <Navbar /> {/* Navbar stays at the top */}
+      <Navbar />
       <div style={styles.container}>
         <h2 style={styles.sectionHeading}>My Meetings</h2>
 
-        <input
-          type="text"
-          placeholder="Search meetings..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          style={styles.search}
-        />
+        <div style={styles.controlsRow}>
+          <input
+            type="text"
+            placeholder="Search..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            style={styles.search}
+          />
 
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          style={styles.deleteToggle}
-          onClick={() => setShowDeleteMode((prev) => !prev)}
-        >
-          {showDeleteMode ? "Cancel Delete" : "Delete Meetings"}
-        </motion.button>
+          <select
+            value={sortOption}
+            onChange={(e) => setSortOption(e.target.value)}
+            style={styles.dropdown}
+          >
+            <option value="newest">Newest First</option>
+            <option value="oldest">Oldest First</option>
+            <option value="title-az">Title A-Z</option>
+            <option value="title-za">Title Z-A</option>
+          </select>
+
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            style={styles.deleteToggle}
+            onClick={() => setShowDeleteMode((prev) => !prev)}
+          >
+            {showDeleteMode ? "Cancel Delete" : "Delete Meetings"}
+          </motion.button>
+        </div>
 
         {showDeleteMode && (
           <motion.button
@@ -162,7 +214,7 @@ function MyMeetings() {
           <p style={styles.empty}>No meetings found.</p>
         ) : (
           <div style={styles.meetingsContainer}>
-            {filteredMeetings.map((meeting) => (
+            {filteredMeetings.map((meeting, index) => (
               <div
                 key={meeting._id}
                 style={{
@@ -182,9 +234,15 @@ function MyMeetings() {
                 )}
                 <div
                   style={{ flex: 1 }}
-                  onClick={() => !showDeleteMode && setSelectedMeeting(meeting)}
+                  onClick={() =>
+                    !showDeleteMode && setSelectedMeeting(meeting)
+                  }
                 >
-                  <MeetingCard meeting={meeting} />
+                  <MeetingCard
+                    meeting={meeting}
+                    index={index}
+                    onToggleFavorite={handleToggleFavorite}
+                  />
                 </div>
               </div>
             ))}

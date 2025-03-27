@@ -88,4 +88,21 @@ router.delete("/:id", async (req, res) => {
   }
 });
 
+// PATCH /api/meetings/:id/favorite
+router.patch("/:id/favorite", async (req, res) => {
+  try {
+    const { isFavorite } = req.body;
+    const updated = await Meeting.findByIdAndUpdate(
+      req.params.id,
+      { isFavorite },
+      { new: true }
+    );
+    res.json(updated);
+  } catch (err) {
+    console.error("Error updating favorite:", err);
+    res.status(500).json({ message: "Failed to update favorite" });
+  }
+});
+
+
 module.exports = router;
