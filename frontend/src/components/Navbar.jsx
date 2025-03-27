@@ -7,7 +7,7 @@ const styles = {
   nav: {
     position: "fixed",
     top: 0,
-    left: 0,
+    left: -20,
     width: "100%",
     backgroundColor: "#1e1b4b",
     zIndex: 50,
@@ -70,9 +70,9 @@ function Navbar() {
 
   return (
     <nav style={styles.nav}>
-      <Link to="/" style={styles.logo}>
+      {/* <Link to="/" style={styles.logo}>
         MeetingTranscriber
-      </Link>
+      </Link> */}
       <div style={styles.links}>
         {links.map((link) => (
           <Link

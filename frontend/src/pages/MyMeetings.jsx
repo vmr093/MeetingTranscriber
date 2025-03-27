@@ -7,66 +7,109 @@ import MeetingCard from "../components/MeetingCard";
 import MeetingModal from "../components/MeetingModal";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { MdSearch, MdDelete, MdSort, MdDateRange } from "react-icons/md";
+import {
+  MdDelete,
+  MdSearch,
+  MdCalendarToday,
+  MdSortByAlpha,
+} from "react-icons/md";
 
 const styles = {
   container: {
-    padding: "6rem 1rem 5rem",
-    maxWidth: "100%",
+    padding: "6rem 1.5rem 5rem",
+    maxWidth: "800px",
     margin: "0 auto",
+    color: "#fff",
     textAlign: "center",
-    color: "#fff",
-  },
-  sectionHeading: {
-    fontSize: "1.75rem",
-    fontWeight: "bold",
-    marginBottom: "1rem",
-    color: "#fff",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center", // ✅ ensures content centers horizontally
   },
   meetingsContainer: {
     display: "flex",
     flexDirection: "column",
-    alignItems: "center",
-    gap: "1rem",
+    alignItems: "center", // ✅ centers cards horizontally
+    justifyContent: "center",
+    width: "100%",
+    maxWidth: "600px", // ✅ optional, but helps keep layout tight
+    margin: "0 auto", // ✅ centers container itself
+    padding: "1rem 0",
   },
-  bottomBar: {
+
+  empty: {
+    color: "var(--text-muted)",
+    fontStyle: "italic",
+  },
+  floatingBar: {
     position: "fixed",
     bottom: 0,
-    left: 0,
     width: "100%",
-    backgroundColor: "#1e1b4b",
-    padding: "0.75rem 2rem",
+    background: "rgba(30, 27, 75, 0.95)",
+    backdropFilter: "blur(10px)",
     display: "flex",
     justifyContent: "space-around",
-    alignItems: "center",
-    boxShadow: "0 -2px 8px rgba(0, 0, 0, 0.2)",
-    borderTopLeftRadius: "20px",
-    borderTopRightRadius: "20px",
+    padding: "0.75rem 0",
+    boxShadow: "0 -2px 6px rgba(0,0,0,0.3)",
     zIndex: 100,
   },
   iconButton: {
-    fontSize: "1.75rem",
+    background: "none",
+    border: "none",
     color: "#fff",
+    fontSize: "1.6rem",
     cursor: "pointer",
+    position: "relative",
   },
-  datepicker: {
+  tooltip: {
     position: "absolute",
-    bottom: "4rem",
-    left: "50%",
-    transform: "translateX(-50%)",
-    zIndex: 1000,
+    bottom: "2.5rem",
+    backgroundColor: "#000",
+    color: "#fff",
+    fontSize: "0.75rem",
+    padding: "4px 8px",
+    borderRadius: "4px",
+    whiteSpace: "nowrap",
+    zIndex: 999,
+  },
+  datepickerWrapper: {
+    position: "absolute",
+    bottom: "3rem",
+  },
+  confirmDelete: {
+    marginTop: "1rem",
+    display: "flex",
+    gap: "1rem",
+    justifyContent: "center",
+  },
+  confirmBtn: {
+    backgroundColor: "#e53e3e",
+    border: "none",
+    padding: "0.4rem 1rem",
+    borderRadius: "10px",
+    fontWeight: "bold",
+    cursor: "pointer",
+    color: "#fff",
+  },
+  cancelBtn: {
+    backgroundColor: "#4a5568",
+    border: "none",
+    padding: "0.4rem 1rem",
+    borderRadius: "10px",
+    fontWeight: "bold",
+    cursor: "pointer",
+    color: "#fff",
   },
 };
 
 function MyMeetings() {
   const [meetings, setMeetings] = useState([]);
-  const [selectedMeeting, setSelectedMeeting] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [sortOption, setSortOption] = useState("newest");
-  const [selectedDate, setSelectedDate] = useState(null);
+  const [selectedMeeting, setSelectedMeeting] = useState(null);
   const [selectedForDelete, setSelectedForDelete] = useState([]);
   const [showDeleteMode, setShowDeleteMode] = useState(false);
-  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [sortOption, setSortOption] = useState("newest");
+  const [selectedDate, setSelectedDate] = useState(null);
+  const [showTooltip, setShowTooltip] = useState("");
 
   useEffect(() => {
     axios
@@ -78,15 +121,41 @@ function MyMeetings() {
       });
   }, []);
 
-  const handleToggleSelect = (id) => {
+  const handleToggleSelect = (meetingId) => {
     setSelectedForDelete((prev) =>
-      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
+      prev.includes(meetingId)
+        ? prev.filter((id) => id !== meetingId)
+        : [...prev, meetingId]
     );
   };
 
+  const handleToggleFavorite = async (meetingId) => {
+    try {
+      const meeting = meetings.find((m) => m._id === meetingId);
+      const res = await axios.patch(
+        `${
+          import.meta.env.VITE_API_BASE_URL
+        }/api/meetings/${meetingId}/favorite`,
+        {
+          isFavorite: !meeting.isFavorite,
+        }
+      );
+      const updated = res.data;
+      setMeetings((prev) =>
+        prev.map((m) => (m._id === updated._id ? updated : m))
+      );
+    } catch (err) {
+      toast.error("Failed to toggle favorite");
+      console.error(err);
+    }
+  };
+
   const handleDeleteSelected = async () => {
-    if (selectedForDelete.length === 0)
-      return toast.error("No meetings selected");
+    if (selectedForDelete.length === 0) {
+      toast.error("No meetings selected.");
+      return;
+    }
+
     try {
       await Promise.all(
         selectedForDelete.map((id) =>
@@ -95,44 +164,29 @@ function MyMeetings() {
           )
         )
       );
-      toast.success("Deleted successfully");
+      toast.success("Deleted selected meetings.");
       setMeetings((prev) =>
         prev.filter((m) => !selectedForDelete.includes(m._id))
       );
       setSelectedForDelete([]);
       setShowDeleteMode(false);
-    } catch (err) {
-      toast.error("Delete failed");
-    }
-  };
-
-  const handleToggleFavorite = async (id) => {
-    try {
-      const res = await axios.patch(
-        `${import.meta.env.VITE_API_BASE_URL}/api/meetings/${id}/favorite`
-      );
-      const updated = res.data;
-      setMeetings((prev) =>
-        prev.map((m) => (m._id === updated._id ? updated : m))
-      );
-    } catch (err) {
-      toast.error("Failed to toggle favorite");
+    } catch (error) {
+      console.error("Batch delete failed:", error);
+      toast.error("Error deleting meetings.");
     }
   };
 
   const filteredMeetings = meetings
     .filter((m) => m.title.toLowerCase().includes(searchTerm.toLowerCase()))
-    .filter((m) => {
-      if (!selectedDate) return true;
-      const meetingDate = new Date(m.uploadedAt);
-      return meetingDate.toDateString() === selectedDate.toDateString();
-    })
+    .filter((m) =>
+      selectedDate
+        ? new Date(m.uploadedAt).toDateString() === selectedDate.toDateString()
+        : true
+    )
     .sort((a, b) => {
       if (sortOption === "title-az") return a.title.localeCompare(b.title);
       if (sortOption === "title-za") return b.title.localeCompare(a.title);
-      if (sortOption === "oldest")
-        return new Date(a.uploadedAt) - new Date(b.uploadedAt);
-      return new Date(b.uploadedAt) - new Date(a.uploadedAt);
+      return new Date(b.uploadedAt) - new Date(a.uploadedAt); // Default to newest
     });
 
   return (
@@ -142,7 +196,7 @@ function MyMeetings() {
         <h2 style={styles.sectionHeading}>My Meetings</h2>
 
         {filteredMeetings.length === 0 ? (
-          <p style={{ opacity: 0.6 }}>No meetings found.</p>
+          <p style={styles.empty}>No meetings found.</p>
         ) : (
           <div style={styles.meetingsContainer}>
             {filteredMeetings.map((meeting, index) => (
@@ -150,9 +204,8 @@ function MyMeetings() {
                 key={meeting._id}
                 style={{
                   display: "flex",
-                  width: "90%",
-                  maxWidth: "600px",
-                  justifyContent: "center",
+                  justifyContent: "center", // ✅ centers the card horizontally
+                  width: "100%",
                 }}
               >
                 {showDeleteMode && (
@@ -160,17 +213,34 @@ function MyMeetings() {
                     type="checkbox"
                     checked={selectedForDelete.includes(meeting._id)}
                     onChange={() => handleToggleSelect(meeting._id)}
-                    style={{ marginRight: "0.75rem", transform: "scale(1.2)" }}
+                    style={{ transform: "scale(1.2)", marginBottom: "0.5rem" }}
                   />
                 )}
                 <MeetingCard
                   meeting={meeting}
                   index={index}
-                  onClick={setSelectedMeeting}
+                  onClick={() => !showDeleteMode && setSelectedMeeting(meeting)}
                   onToggleFavorite={handleToggleFavorite}
                 />
               </div>
             ))}
+          </div>
+        )}
+
+        {showDeleteMode && (
+          <div style={styles.confirmDelete}>
+            <button style={styles.confirmBtn} onClick={handleDeleteSelected}>
+              Confirm Delete
+            </button>
+            <button
+              style={styles.cancelBtn}
+              onClick={() => {
+                setShowDeleteMode(false);
+                setSelectedForDelete([]);
+              }}
+            >
+              Cancel
+            </button>
           </div>
         )}
 
@@ -181,59 +251,88 @@ function MyMeetings() {
         />
       </div>
 
-      {/* Bottom Icon Bar */}
-      <div style={styles.bottomBar}>
-        <div title="Search">
-          <MdSearch
-            style={styles.iconButton}
-            onClick={() => setSearchTerm(prompt("Search term:") || "")}
-          />
+      {/* Bottom Floating Controls */}
+      <div style={styles.floatingBar}>
+        <div
+          style={styles.iconButton}
+          onMouseEnter={() => setShowTooltip("search")}
+          onMouseLeave={() => setShowTooltip("")}
+        >
+          <MdSearch />
+          {showTooltip === "search" && (
+            <div style={styles.tooltip}>
+              <input
+                type="text"
+                placeholder="Search"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                style={{
+                  padding: "0.4rem 0.6rem",
+                  borderRadius: "6px",
+                  border: "1px solid #555",
+                  backgroundColor: "#222",
+                  color: "#fff",
+                }}
+              />
+            </div>
+          )}
         </div>
-        <div title="Sort">
-          <MdSort
-            style={styles.iconButton}
-            onClick={() =>
-              setSortOption((prev) =>
-                prev === "newest"
-                  ? "title-az"
-                  : prev === "title-az"
-                  ? "title-za"
-                  : "newest"
-              )
-            }
-          />
+
+        <div
+          style={styles.iconButton}
+          onMouseEnter={() => setShowTooltip("delete")}
+          onMouseLeave={() => setShowTooltip("")}
+          onClick={() => setShowDeleteMode((prev) => !prev)}
+        >
+          <MdDelete />
+          {showTooltip === "delete" && <div style={styles.tooltip}>Delete</div>}
         </div>
-        <div title="Date Filter">
-          <MdDateRange
-            style={styles.iconButton}
-            onClick={() => setShowDatePicker((prev) => !prev)}
-          />
+
+        <div
+          style={styles.iconButton}
+          onMouseEnter={() => setShowTooltip("calendar")}
+          onMouseLeave={() => setShowTooltip("")}
+        >
+          <MdCalendarToday />
+          {showTooltip === "calendar" && (
+            <div style={styles.tooltip}>
+              <DatePicker
+                selected={selectedDate}
+                onChange={(date) => setSelectedDate(date)}
+                dateFormat="MM/dd/yyyy"
+                placeholderText="Filter by date"
+                inline
+              />
+            </div>
+          )}
         </div>
-        <div title={showDeleteMode ? "Cancel Delete" : "Delete"}>
-          <MdDelete
-            style={{
-              ...styles.iconButton,
-              color: showDeleteMode ? "#ff4d4f" : "#fff",
-            }}
-            onClick={() =>
-              showDeleteMode ? handleDeleteSelected() : setShowDeleteMode(true)
-            }
-          />
+
+        <div
+          style={styles.iconButton}
+          onMouseEnter={() => setShowTooltip("sort")}
+          onMouseLeave={() => setShowTooltip("")}
+        >
+          <MdSortByAlpha />
+          {showTooltip === "sort" && (
+            <div style={styles.tooltip}>
+              <select
+                value={sortOption}
+                onChange={(e) => setSortOption(e.target.value)}
+                style={{
+                  padding: "0.3rem",
+                  background: "#222",
+                  color: "#fff",
+                  borderRadius: "5px",
+                }}
+              >
+                <option value="newest">Newest First</option>
+                <option value="title-az">Title A-Z</option>
+                <option value="title-za">Title Z-A</option>
+              </select>
+            </div>
+          )}
         </div>
       </div>
-
-      {showDatePicker && (
-        <div style={styles.datepicker}>
-          <DatePicker
-            selected={selectedDate}
-            onChange={(date) => {
-              setSelectedDate(date);
-              setShowDatePicker(false);
-            }}
-            inline
-          />
-        </div>
-      )}
     </>
   );
 }
