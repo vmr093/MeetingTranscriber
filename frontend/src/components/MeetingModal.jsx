@@ -321,11 +321,11 @@ const styles = {
     backdropFilter: "blur(10px)",
   },
   modal: {
-    background: "rgba(181, 185, 245, 0.85)",
+    background: "rgba(5, 6, 20, 0.85)",
     borderRadius: "25px",
     padding: "1rem",
     width: "80%",
-    maxWidth: "375px",
+    maxWidth: "450px",
     maxHeight: "75vh",
     overflowY: "auto",
     boxShadow: "0 8px 30px rgba(0,0,0,0.2)",
@@ -334,12 +334,12 @@ const styles = {
     fontSize: "2rem",
     fontWeight: "bold",
     marginBottom: "1rem",
-    color: "#2d3a69",
+    color: "#4eaaff",
     textAlign: "left",
   },
   date: {
-    fontSize: "0.7rem",
-    color: "#2d3a69",
+    fontSize: "1.2rem",
+    color: "#4eaaff",
     marginBottom: "1.5rem",
     textAlign: "left",
   },
@@ -347,7 +347,7 @@ const styles = {
   sectionContent: {
     listStyleType: "disc",
     paddingLeft: "1.5rem",
-    color: "#2d3a69",
+    color: "#e1eaed",
   },
   contentInput: {
     border: "1px solid #ccc",

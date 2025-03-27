@@ -1,13 +1,17 @@
 import { useState, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import toast from "react-hot-toast";
 import { getAuth } from "firebase/auth";
+import { ProgressBar } from "react-loader-spinner";
 
 function RecordModal({ isOpen, onClose, onUploadComplete }) {
   const [title, setTitle] = useState("");
   const [recording, setRecording] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
+  const navigate = useNavigate();
 
   const handleStartRecording = async () => {
     if (!title.trim()) {
@@ -26,6 +30,7 @@ function RecordModal({ isOpen, onClose, onUploadComplete }) {
       };
 
       mediaRecorder.onstop = async () => {
+        setIsUploading(true);
         const blob = new Blob(audioChunksRef.current, { type: "audio/webm" });
         const formData = new FormData();
         formData.append("audio", blob, `${title}.webm`);
@@ -50,12 +55,15 @@ function RecordModal({ isOpen, onClose, onUploadComplete }) {
             toast.success("Meeting uploaded and transcribed!");
             onUploadComplete(data);
             onClose();
+            navigate("/meetings"); // Redirect after success
           } else {
             toast.error(data.message || "Upload failed");
           }
         } catch (err) {
           console.error("Upload error:", err);
           toast.error("Upload error. See console.");
+        } finally {
+          setIsUploading(false);
         }
       };
 
@@ -150,9 +158,19 @@ function RecordModal({ isOpen, onClose, onUploadComplete }) {
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               style={styles.input}
+              disabled={recording || isUploading}
             />
 
-            {!recording ? (
+            {isUploading ? (
+              <ProgressBar
+                height="80"
+                width="100%"
+                ariaLabel="progress-bar-loading"
+                wrapperStyle={{ marginTop: "1rem" }}
+                barColor="#4eaaff"
+                borderColor="#fff"
+              />
+            ) : !recording ? (
               <button style={styles.recordBtn} onClick={handleStartRecording}>
                 Start Recording
               </button>
@@ -163,7 +181,11 @@ function RecordModal({ isOpen, onClose, onUploadComplete }) {
             )}
 
             <br />
-            <button style={styles.closeBtn} onClick={onClose}>
+            <button
+              style={styles.closeBtn}
+              onClick={onClose}
+              disabled={isUploading}
+            >
               Cancel
             </button>
           </motion.div>

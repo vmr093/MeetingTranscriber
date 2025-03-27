@@ -7,7 +7,7 @@ const styles = {
     backdropFilter: "blur(10px)",
     borderRadius: "12px",
     padding: "1rem 1.5rem",
-    width: "70%",
+    width: "60%",
     boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
     cursor: "pointer",
     display: "flex",
