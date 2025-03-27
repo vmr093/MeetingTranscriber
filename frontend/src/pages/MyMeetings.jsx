@@ -4,6 +4,7 @@ import toast from "react-hot-toast";
 import { motion } from "framer-motion";
 import MeetingCard from "../components/MeetingCard";
 import MeetingModal from "../components/MeetingModal";
+import Navbar from "../components/Navbar";
 
 const styles = {
   container: {
@@ -124,76 +125,79 @@ function MyMeetings() {
   );
 
   return (
-    <div style={styles.container}>
-      <h2 style={styles.sectionHeading}>My Meetings</h2>
+    <>
+      <Navbar /> {/* Navbar stays at the top */}
+      <div style={styles.container}>
+        <h2 style={styles.sectionHeading}>My Meetings</h2>
 
-      <input
-        type="text"
-        placeholder="Search meetings..."
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-        style={styles.search}
-      />
+        <input
+          type="text"
+          placeholder="Search meetings..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          style={styles.search}
+        />
 
-      <motion.button
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
-        style={styles.deleteToggle}
-        onClick={() => setShowDeleteMode((prev) => !prev)}
-      >
-        {showDeleteMode ? "Cancel Delete" : "Delete Meetings"}
-      </motion.button>
-
-      {showDeleteMode && (
         <motion.button
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
-          style={styles.confirmDelete}
-          onClick={handleDeleteSelected}
+          style={styles.deleteToggle}
+          onClick={() => setShowDeleteMode((prev) => !prev)}
         >
-          Confirm Delete ({selectedForDelete.length})
+          {showDeleteMode ? "Cancel Delete" : "Delete Meetings"}
         </motion.button>
-      )}
 
-      {filteredMeetings.length === 0 ? (
-        <p style={styles.empty}>No meetings found.</p>
-      ) : (
-        <div style={styles.meetingsContainer}>
-          {filteredMeetings.map((meeting) => (
-            <div
-              key={meeting._id}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                width: "100%",
-                gap: "0.5rem",
-              }}
-            >
-              {showDeleteMode && (
-                <input
-                  type="checkbox"
-                  checked={selectedForDelete.includes(meeting._id)}
-                  onChange={() => handleToggleSelect(meeting._id)}
-                  style={{ transform: "scale(1.3)", cursor: "pointer" }}
-                />
-              )}
+        {showDeleteMode && (
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            style={styles.confirmDelete}
+            onClick={handleDeleteSelected}
+          >
+            Confirm Delete ({selectedForDelete.length})
+          </motion.button>
+        )}
+
+        {filteredMeetings.length === 0 ? (
+          <p style={styles.empty}>No meetings found.</p>
+        ) : (
+          <div style={styles.meetingsContainer}>
+            {filteredMeetings.map((meeting) => (
               <div
-                style={{ flex: 1 }}
-                onClick={() => !showDeleteMode && setSelectedMeeting(meeting)}
+                key={meeting._id}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  width: "100%",
+                  gap: "0.5rem",
+                }}
               >
-                <MeetingCard meeting={meeting} />
+                {showDeleteMode && (
+                  <input
+                    type="checkbox"
+                    checked={selectedForDelete.includes(meeting._id)}
+                    onChange={() => handleToggleSelect(meeting._id)}
+                    style={{ transform: "scale(1.3)", cursor: "pointer" }}
+                  />
+                )}
+                <div
+                  style={{ flex: 1 }}
+                  onClick={() => !showDeleteMode && setSelectedMeeting(meeting)}
+                >
+                  <MeetingCard meeting={meeting} />
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
-      )}
+            ))}
+          </div>
+        )}
 
-      <MeetingModal
-        isOpen={!!selectedMeeting}
-        meeting={selectedMeeting}
-        onClose={() => setSelectedMeeting(null)}
-      />
-    </div>
+        <MeetingModal
+          isOpen={!!selectedMeeting}
+          meeting={selectedMeeting}
+          onClose={() => setSelectedMeeting(null)}
+        />
+      </div>
+    </>
   );
 }
 
