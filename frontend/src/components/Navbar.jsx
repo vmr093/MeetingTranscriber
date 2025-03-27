@@ -1,11 +1,7 @@
 import { Link, useLocation } from "react-router-dom";
-import {
-  MdLogout,
-  MdSettings,
-  MdFavorite,
-  MdHome,
-  MdMeetingRoom,
-} from "react-icons/md";
+
+import {MdLogout, MdSettings, MdFavorite, MdHome, MdMeetingRoom, } from "react-icons/md";
+
 
 const styles = {
   nav: {
