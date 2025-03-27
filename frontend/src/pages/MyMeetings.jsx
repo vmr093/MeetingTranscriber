@@ -5,6 +5,9 @@ import { motion } from "framer-motion";
 import MeetingCard from "../components/MeetingCard";
 import MeetingModal from "../components/MeetingModal";
 import Navbar from "../components/Navbar";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+
 
 const styles = {
   container: {
@@ -71,9 +74,10 @@ const styles = {
   meetingsContainer: {
     display: "flex",
     flexDirection: "column",
-    gap: "1rem",
     alignItems: "center",
     justifyContent: "center",
+    padding: "1rem 0",
+    width: "100%",
   },
   empty: {
     color: "var(--text-muted)",
@@ -88,6 +92,8 @@ function MyMeetings() {
   const [selectedForDelete, setSelectedForDelete] = useState([]);
   const [showDeleteMode, setShowDeleteMode] = useState(false);
   const [sortOption, setSortOption] = useState("newest");
+  const [selectedDate, setSelectedDate] = useState(null);
+
 
   useEffect(() => {
     axios
