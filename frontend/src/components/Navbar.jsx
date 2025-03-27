@@ -28,7 +28,7 @@ const styles = {
     fontWeight: "bold",
     fontSize: "2rem",
     marginRight: "2rem",
-
+    marginBottom: "0.5rem",
   },
   links: {
     display: "flex",
