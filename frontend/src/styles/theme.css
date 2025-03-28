@@ -1,12 +1,32 @@
-body {
-  background-color: #000; /* or #0d0d0d for a slightly softer black */
-  color: #fff;
-  margin: 0;
-  font-family: 'Poppins', ; /* or match your UI font */
-}
-
+/* Default Theme Variables */
 :root {
+  --bg-color: #000;
   --text-color: #ffffff;
   --text-muted: #cccccc;
-  --primary-color: #007bff; /* your blue theme */
+  --primary-color: #007bff; /* Main blue accent */
+}
+
+/* Apply default theme */
+body {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+}
+
+/* Alt Theme: Soft purple + light accents */
+body.alt-theme {
+  --bg-color: #14131a;
+  --text-color: #e0e0e0;
+  --text-muted: #aaa;
+  --primary-color: #ff9ff3; /* Soft pink/purple */
+}
+
+/* Optional enhancements */
+a {
+  color: var(--primary-color);
+}
+
+button {
+  font-family: inherit;
 }

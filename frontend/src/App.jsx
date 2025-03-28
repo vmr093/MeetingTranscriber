@@ -6,6 +6,8 @@ import Signup from "./pages/signup";
 import PrivateRoute from "./components/PrivateRoute";
 import MyMeetings from "./pages/MyMeetings";
 import Favorites from "./pages/Favorites";
+import Settings from "./pages/Settings";
+
 
 function App() {
   return (
@@ -37,10 +39,19 @@ function App() {
               <Favorites />
             </PrivateRoute>
           }
-          />
+        />
+        <Route
+          path="/settings"
+          element={
+            <PrivateRoute>
+              <Settings />
+            </PrivateRoute>
+          }
+        />
       </Routes>
     </Router>
   );
+  
 }
 
 export default App;
