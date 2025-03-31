@@ -5,7 +5,12 @@ export default defineConfig({
   plugins: [react()],
   server: {
     proxy: {
-      "/api": "http://localhost:8080", // 👈 forwards API requests
+      "/api": "http://localhost:8080",
+    },
+  },
+  build: {
+    rollupOptions: {
+      external: ["react-firebase-hooks"],
     },
   },
 });
