@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import toast from "react-hot-toast";
 import { getAuth } from "firebase/auth";
-import { ProgressBar } from "react-loader-spinner";
 
 function RecordModal({ isOpen, onClose, onUploadComplete }) {
   const [title, setTitle] = useState("");
@@ -55,7 +54,7 @@ function RecordModal({ isOpen, onClose, onUploadComplete }) {
             toast.success("Meeting uploaded and transcribed!");
             onUploadComplete(data);
             onClose();
-            navigate("/meetings"); // Redirect after success
+            navigate("/meetings");
           } else {
             toast.error(data.message || "Upload failed");
           }
@@ -139,59 +138,71 @@ function RecordModal({ isOpen, onClose, onUploadComplete }) {
       borderRadius: "10px",
       cursor: "pointer",
     },
+    spinner: {
+      margin: "1rem auto",
+      width: "32px",
+      height: "32px",
+      border: "4px solid rgba(255, 255, 255, 0.3)",
+      borderTop: "4px solid #4eaaff",
+      borderRadius: "50%",
+      animation: "spin 1s linear infinite",
+    },
   };
 
   return (
-    <AnimatePresence>
-      {isOpen && (
-        <div style={styles.overlay}>
-          <motion.div
-            style={styles.modal}
-            initial={{ opacity: 0, scale: 0.85 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.8 }}
-            transition={{ duration: 0.3 }}
-          >
-            <input
-              type="text"
-              placeholder="Meeting Title"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              style={styles.input}
-              disabled={recording || isUploading}
-            />
+    <>
+      <style>{`
+        @keyframes spin {
+          to {
+            transform: rotate(360deg);
+          }
+        }
+      `}</style>
 
-            {isUploading ? (
-              <ProgressBar
-                height="80"
-                width="100%"
-                ariaLabel="progress-bar-loading"
-                wrapperStyle={{ marginTop: "1rem" }}
-                barColor="#4eaaff"
-                borderColor="#fff"
-              />
-            ) : !recording ? (
-              <button style={styles.recordBtn} onClick={handleStartRecording}>
-                Start Recording
-              </button>
-            ) : (
-              <button style={styles.recordBtn} onClick={handleStopRecording}>
-                Stop & Upload
-              </button>
-            )}
-
-            <br />
-            <button
-              style={styles.closeBtn}
-              onClick={onClose}
-              disabled={isUploading}
+      <AnimatePresence>
+        {isOpen && (
+          <div style={styles.overlay}>
+            <motion.div
+              style={styles.modal}
+              initial={{ opacity: 0, scale: 0.85 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.8 }}
+              transition={{ duration: 0.3 }}
             >
-              Cancel
-            </button>
-          </motion.div>
-        </div>
-      )}
-    </AnimatePresence>
+              <input
+                type="text"
+                placeholder="Meeting Title"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                style={styles.input}
+                disabled={recording || isUploading}
+              />
+
+              {isUploading ? (
+                <div style={styles.spinner} />
+              ) : !recording ? (
+                <button style={styles.recordBtn} onClick={handleStartRecording}>
+                  Start Recording
+                </button>
+              ) : (
+                <button style={styles.recordBtn} onClick={handleStopRecording}>
+                  Stop & Upload
+                </button>
+              )}
+
+              <br />
+              <button
+                style={styles.closeBtn}
+                onClick={onClose}
+                disabled={isUploading}
+              >
+                Cancel
+              </button>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+    </>
   );
 }
 
