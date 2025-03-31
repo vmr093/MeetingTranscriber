@@ -2,6 +2,7 @@ require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
+const path = require("path");
 
 const app = express();
 
@@ -29,6 +30,9 @@ app.use(
 
 app.use(express.json());
 
+// 🔓 Serve static uploads (images, audio, etc.)
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+
 mongoose
   .connect(MONGO_URI)
   .then(() => console.log("✅ Connected to MongoDB"))
@@ -38,6 +42,7 @@ app.get("/", (req, res) => {
   res.send("AI Meeting Summarizer Backend is Running!");
 });
 
+// 🛣️ Routes
 const authRoutes = require("./routes/authRoutes");
 app.use("/api/auth", authRoutes);
 
@@ -55,6 +60,9 @@ app.use("/api/record", uploadRecordRoute);
 
 const recordRoutes = require("./routes/recordRoutes");
 app.use("/api/recordings", recordRoutes);
+
+const uploadAvatarRoute = require("./routes/uploadAvatarRoute");
+app.use("/api/users", uploadAvatarRoute);
 
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
