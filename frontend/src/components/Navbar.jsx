@@ -1,4 +1,6 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { getAuth, signOut } from "firebase/auth";
+import toast from "react-hot-toast";
 import {
   MdLogout,
   MdSettings,
@@ -66,6 +68,7 @@ const styles = {
 
 function Navbar() {
   const location = useLocation();
+  const navigate = useNavigate();
 
   const displayName = localStorage.getItem("displayName");
   const photoURL = localStorage.getItem("photoURL");
@@ -91,23 +94,49 @@ function Navbar() {
 
   const links = isMyMeetings ? linksForMyMeetings : linksForDashboard;
 
+  const handleLogout = async () => {
+    try {
+      const auth = getAuth();
+      await signOut(auth);
+      localStorage.removeItem("token");
+      localStorage.removeItem("displayName");
+      localStorage.removeItem("photoURL");
+      toast.success("Logged out!");
+      navigate("/login");
+    } catch (error) {
+      console.error("Logout error:", error);
+      toast.error("Logout failed");
+    }
+  };
+
   return (
     <nav style={styles.nav}>
-      {/* <Link to="/" style={styles.logo}>
-        MeetingTranscriber
-      </Link> */}
-
       <div style={styles.links}>
-        {links.map((link) => (
-          <Link
-            key={link.to}
-            to={link.to}
-            style={styles.link}
-            title={link.label || ""}
-          >
-            {link.icon ? link.icon : link.label}
-          </Link>
-        ))}
+        {links.map((link) =>
+          link.to === "/logout" ? (
+            <button
+              key={link.to}
+              onClick={handleLogout}
+              style={{
+                ...styles.link,
+                background: "transparent",
+                border: "none",
+              }}
+              title="Logout"
+            >
+              {link.icon}
+            </button>
+          ) : (
+            <Link
+              key={link.to}
+              to={link.to}
+              style={styles.link}
+              title={link.label || ""}
+            >
+              {link.icon ? link.icon : link.label}
+            </Link>
+          )
+        )}
       </div>
 
       {photoURL && (

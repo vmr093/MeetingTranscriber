@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
-import { signInWithPopup, auth, provider } from "../firebase";
+import { auth, provider, signInWithPopup } from "../firebase";
+import { signInWithEmailAndPassword } from "firebase/auth";
 
 function Login() {
   const navigate = useNavigate();
@@ -99,26 +100,19 @@ function Login() {
     }
 
     try {
-      const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/auth/login`, { // Use environment variable
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
-      });
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      const token = await userCredential.user.getIdToken();
 
-      const data = await res.json();
-
-      if (res.ok) {
-        localStorage.setItem("token", data.token);
-        toast.success("Login successful!");
-        navigate("/dashboard");
-      } else {
-        toast.error(data.message || "Login failed");
-      }
+      localStorage.setItem("token", token);
+      toast.success("Login successful!");
+      navigate("/dashboard");
     } catch (error) {
       console.error("Login error:", error);
-      toast.error("An error occurred");
+      toast.error(error.message || "Login failed");
     }
   };
 

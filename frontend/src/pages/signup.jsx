@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
-import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../firebase";
+import { createUserWithEmailAndPassword } from "firebase/auth";
 
 function Signup() {
   const navigate = useNavigate();
@@ -105,14 +106,14 @@ function Signup() {
     }
 
     try {
-      const auth = getAuth();
       const userCredential = await createUserWithEmailAndPassword(
         auth,
         email,
         password
       );
+      const token = await userCredential.user.getIdToken();
 
-      const user = userCredential.user;
+      localStorage.setItem("token", token);
       toast.success("Account created!");
       navigate("/dashboard");
     } catch (error) {
@@ -158,10 +159,7 @@ function Signup() {
           Sign Up
         </button>
 
-        <button
-          style={styles.altButton}
-          onClick={() => toast("Google signup coming soon!")}
-        >
+        <button style={styles.altButton} onClick={() => navigate("/login")}>
           <img src="/assets/google-icon.svg" alt="Google" style={styles.icon} />
           Continue with Google
         </button>
