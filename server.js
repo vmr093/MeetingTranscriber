@@ -9,12 +9,26 @@ const app = express();
 const PORT = process.env.PORT || 8080;
 const MONGO_URI = process.env.MONGO_URI;
 
-const allowedOrigins = [
-  "http://localhost:5173",
-  "https://meeting-transcriber.vercel.app",
-  "https://meeting-transcriber-onbqpsssf-vmr093s-projects.vercel.app",
-  "https://meeting-transcriber-lkl7c4bpl-vmr093s-projects.vercel.app", // 👈 NEW
-];
+const corsOptions = {
+  origin: function (origin, callback) {
+    // Allow localhost during development
+    const isLocalhost = !origin || origin.includes("localhost");
+
+    // Allow any *.vercel.app subdomain
+    const isVercel = origin && /\.vercel\.app$/.test(new URL(origin).hostname);
+
+    if (isLocalhost || isVercel) {
+      callback(null, true);
+    } else {
+      console.warn("❌ Blocked by CORS:", origin);
+      callback(new Error("CORS policy: Origin not allowed"));
+    }
+  },
+  credentials: true,
+};
+
+app.use(cors(corsOptions));
+
 
 
 app.use(
