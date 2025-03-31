@@ -3,9 +3,10 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "dev": "concurrently \"npm run server\" \"npm run client\"",
-    "server": "nodemon server.js",
-    "client": "cd frontend && npm run dev"
+  "start": "node server.js",
+  "dev": "concurrently \"npm run server\" \"npm run client\"",
+  "server": "nodemon server.js",
+  "client": "cd frontend && npm run dev"
   },
   "keywords": [],
   "author": "",
