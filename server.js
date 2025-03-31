@@ -13,7 +13,9 @@ const allowedOrigins = [
   "http://localhost:5173",
   "https://meeting-transcriber.vercel.app",
   "https://meeting-transcriber-onbqpsssf-vmr093s-projects.vercel.app",
+  "https://meeting-transcriber-lkl7c4bpl-vmr093s-projects.vercel.app", // 👈 NEW
 ];
+
 
 app.use(
   cors({
