@@ -1,11 +1,22 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { auth } from "../firebase"; // Adjust path as needed
 
 export default function Landing() {
+  const [user] = useAuthState(auth);
+  const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState("hero");
   const [showScrollTop, setShowScrollTop] = useState(false);
 
+  useEffect(() => {
+    if (user) {
+      navigate("/dashboard");
+    }
+  }, [user, navigate]);
+
+  // ...rest of the component stays the same
   useEffect(() => {
     const handleScroll = () => {
       const sections = ["hero", "features", "about", "contact"];

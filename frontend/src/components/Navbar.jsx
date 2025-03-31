@@ -1,5 +1,7 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
+import { signOut } from "firebase/auth";
+import { auth } from "../firebase"; // adjust this path if needed
 import {
   MdLogout,
   MdSettings,
@@ -54,19 +56,17 @@ const styles = {
     gap: "0.4rem",
     flexShrink: 0,
     marginLeft: "1rem",
-    paddingRight: "0.5rem", // ⬅️ Give the avatar breathing room
-    overflow: "visible", // ⬅️ Prevent clipping
+    paddingRight: "0.5rem",
+    overflow: "visible",
   },
-
   avatar: {
-    width: "32px", // Slightly larger for clarity
+    width: "32px",
     height: "32px",
-    borderRadius: "50%", // Use 50% for perfect circle
+    borderRadius: "50%",
     objectFit: "cover",
     border: "2px solid #4eaaff",
-    marginRight: "1.25rem", // Add a little spacing from edge
+    marginRight: "1.25rem",
   },
-
   name: {
     fontWeight: "bold",
     fontSize: "0.8rem",
@@ -80,6 +80,7 @@ const styles = {
 
 function Navbar() {
   const location = useLocation();
+  const navigate = useNavigate();
 
   const displayName = localStorage.getItem("displayName");
   const photoURL = localStorage.getItem("photoURL");
@@ -87,20 +88,29 @@ function Navbar() {
   const isDashboard = location.pathname === "/dashboard";
   const isMyMeetings = location.pathname === "/meetings";
 
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      localStorage.removeItem("displayName");
+      localStorage.removeItem("photoURL");
+      navigate("/");
+    } catch (error) {
+      console.error("Logout failed", error);
+    }
+  };
+
   const linksForDashboard = [
-    { to: "/", label: "Home" },
     { to: "/meetings", label: "Meetings" },
     { to: "/favorites", label: "Favorites" },
     { to: "/settings", icon: <MdSettings /> },
-    { to: "/logout", icon: <MdLogout /> },
+    { onClick: handleLogout, icon: <MdLogout />, key: "logout" },
   ];
 
   const linksForMyMeetings = [
-    { to: "/", label: "Home" },
-    { to: "/dashboard", label: "Dash" },
+    { to: "/", label: "New" },
     { to: "/favorites", label: "Favorites" },
     { to: "/settings", icon: <MdSettings /> },
-    { to: "/logout", icon: <MdLogout /> },
+    { onClick: handleLogout, icon: <MdLogout />, key: "logout" },
   ];
 
   const links = isMyMeetings ? linksForMyMeetings : linksForDashboard;
@@ -110,13 +120,28 @@ function Navbar() {
       <div style={styles.links}>
         {links.map((link) => (
           <motion.div
-            key={link.to}
+            key={link.key || link.to || link.label}
             whileHover={{ y: -2, color: "#4eaaff" }}
             transition={{ type: "spring", stiffness: 300 }}
           >
-            <Link to={link.to} style={styles.link} title={link.label || ""}>
-              {link.icon ? link.icon : link.label}
-            </Link>
+            {link.to ? (
+              <Link to={link.to} style={styles.link} title={link.label || ""}>
+                {link.icon || link.label}
+              </Link>
+            ) : (
+              <button
+                onClick={link.onClick}
+                style={{
+                  ...styles.link,
+                  background: "none",
+                  border: "none",
+                  cursor: "pointer",
+                }}
+                title="Logout"
+              >
+                {link.icon}
+              </button>
+            )}
           </motion.div>
         ))}
       </div>
