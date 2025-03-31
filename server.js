@@ -34,15 +34,21 @@ app.use(cors(corsOptions));
 app.use(
   cors({
     origin: function (origin, callback) {
-      if (!origin || allowedOrigins.includes(origin)) {
-        return callback(null, true);
+      const isLocalhost = !origin || origin.includes("localhost");
+      const isVercel =
+        origin && /\.vercel\.app$/.test(new URL(origin).hostname);
+
+      if (isLocalhost || isVercel) {
+        callback(null, true);
       } else {
-        return callback(new Error("CORS policy: Origin not allowed"));
+        console.warn("❌ Blocked by CORS:", origin);
+        callback(new Error("CORS policy: Origin not allowed"));
       }
     },
     credentials: true,
   })
 );
+
 
 app.use(express.json());
 
