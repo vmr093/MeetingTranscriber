@@ -1,19 +1,23 @@
 import { Link, useLocation } from "react-router-dom";
-
-import {MdLogout, MdSettings, MdFavorite, MdHome, MdMeetingRoom, } from "react-icons/md";
-
+import {
+  MdLogout,
+  MdSettings,
+  MdFavorite,
+  MdHome,
+  MdMeetingRoom,
+} from "react-icons/md";
 
 const styles = {
   nav: {
     position: "fixed",
     top: 0,
-    left: -20,
+    left: 0,
     width: "100%",
     backgroundColor: "#1e1b4b",
     zIndex: 50,
     padding: "1rem 1.5rem",
     display: "flex",
-    justifyContent: "center",
+    justifyContent: "space-between",
     alignItems: "center",
     flexWrap: "wrap",
     boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
@@ -22,9 +26,7 @@ const styles = {
     color: "#4eaaff",
     textDecoration: "none",
     fontWeight: "bold",
-    fontSize: "2rem",
-    marginRight: "2rem",
-    marginBottom: "0.5rem",
+    fontSize: "1.2rem",
   },
   links: {
     display: "flex",
@@ -42,10 +44,31 @@ const styles = {
     gap: "0.4rem",
     transition: "color 0.3s",
   },
+  userInfo: {
+    display: "flex",
+    alignItems: "center",
+    gap: "0.5rem",
+    marginLeft: "1.5rem",
+  },
+  avatar: {
+    width: "35px",
+    height: "35px",
+    borderRadius: "50%",
+    objectFit: "cover",
+    border: "2px solid #4eaaff",
+  },
+  name: {
+    fontWeight: "bold",
+    fontSize: "0.95rem",
+    color: "#fff",
+  },
 };
 
 function Navbar() {
   const location = useLocation();
+
+  const displayName = localStorage.getItem("displayName");
+  const photoURL = localStorage.getItem("photoURL");
 
   const isDashboard = location.pathname === "/dashboard";
   const isMyMeetings = location.pathname === "/meetings";
@@ -62,7 +85,7 @@ function Navbar() {
     { to: "/", label: "Home" },
     { to: "/dashboard", label: "Dashboard" },
     { to: "/favorites", label: "Favorites" },
-    { to: "/settings",  icon: <MdSettings /> },
+    { to: "/settings", icon: <MdSettings /> },
     { to: "/logout", icon: <MdLogout /> },
   ];
 
@@ -73,18 +96,26 @@ function Navbar() {
       {/* <Link to="/" style={styles.logo}>
         MeetingTranscriber
       </Link> */}
+
       <div style={styles.links}>
         {links.map((link) => (
           <Link
             key={link.to}
             to={link.to}
             style={styles.link}
-            title={link.label || ""} // Adds tooltip only if label exists
+            title={link.label || ""}
           >
             {link.icon ? link.icon : link.label}
           </Link>
         ))}
       </div>
+
+      {photoURL && (
+        <div style={styles.userInfo}>
+          {displayName && <span style={styles.name}>{displayName}</span>}
+          <img src={photoURL} alt="Avatar" style={styles.avatar} />
+        </div>
+      )}
     </nav>
   );
 }

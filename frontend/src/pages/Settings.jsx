@@ -101,6 +101,7 @@ function Settings() {
         photoURL: previewImage,
       });
 
+      // 🔐 Save to localStorage for global access (e.g., Navbar)
       localStorage.setItem("displayName", displayName);
       localStorage.setItem("photoURL", previewImage);
 

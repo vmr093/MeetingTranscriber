@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 
 function Signup() {
   const navigate = useNavigate();
@@ -104,30 +105,26 @@ function Signup() {
     }
 
     try {
-      const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/auth/register`, { // Use environment variable
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
+      const auth = getAuth();
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
 
-      const data = await res.json();
-
-      if (res.ok) {
-        toast.success("Account created!");
-        navigate("/login");
-      } else {
-        toast.error(data.message || "Signup failed");
-      }
+      const user = userCredential.user;
+      toast.success("Account created!");
+      navigate("/dashboard");
     } catch (error) {
       console.error("Signup error:", error);
-      toast.error("An error occurred. Please try again.");
+      toast.error(error.message || "An error occurred. Please try again.");
     }
   };
 
   return (
     <div style={styles.page}>
       <button style={styles.homeButton} onClick={() => navigate("/")}>
-         Home
+        Home
       </button>
 
       <div style={styles.formContainer}>
