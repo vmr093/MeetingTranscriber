@@ -1,6 +1,5 @@
-import { Link, useLocation, useNavigate } from "react-router-dom";
-import { getAuth, signOut } from "firebase/auth";
-import toast from "react-hot-toast";
+import { Link, useLocation } from "react-router-dom";
+import { motion } from "framer-motion";
 import {
   MdLogout,
   MdSettings,
@@ -17,12 +16,13 @@ const styles = {
     width: "100%",
     backgroundColor: "#1e1b4b",
     zIndex: 50,
-    padding: "1rem 1.5rem",
+    padding: "1rem 1.25rem",
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
-    flexWrap: "wrap",
+    flexWrap: "nowrap",
     boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+    overflow: "hidden",
   },
   logo: {
     color: "#4eaaff",
@@ -32,43 +32,54 @@ const styles = {
   },
   links: {
     display: "flex",
-    gap: "1.5rem",
+    gap: "1rem",
     alignItems: "center",
-    flexWrap: "wrap",
+    flex: 1,
+    flexWrap: "nowrap",
   },
   link: {
     color: "#fff",
     textDecoration: "none",
-    fontSize: "1rem",
+    fontSize: "0.95rem",
     fontWeight: "bold",
     display: "flex",
     alignItems: "center",
-    gap: "0.4rem",
-    transition: "color 0.3s",
+    gap: "0.3rem",
+    transition: "all 0.3s ease",
+    whiteSpace: "nowrap",
   },
   userInfo: {
     display: "flex",
     alignItems: "center",
-    gap: "0.5rem",
-    marginLeft: "1.5rem",
+    gap: "0.4rem",
+    flexShrink: 0,
+    marginLeft: "1rem",
+    paddingRight: "0.5rem", // ⬅️ Give the avatar breathing room
+    overflow: "visible", // ⬅️ Prevent clipping
   },
+
   avatar: {
-    width: "35px",
-    height: "35px",
-    borderRadius: "50%",
+    width: "32px", // Slightly larger for clarity
+    height: "32px",
+    borderRadius: "50%", // Use 50% for perfect circle
     objectFit: "cover",
     border: "2px solid #4eaaff",
+    marginRight: "1.25rem", // Add a little spacing from edge
   },
+
   name: {
     fontWeight: "bold",
-    fontSize: "0.95rem",
+    fontSize: "0.8rem",
     color: "#fff",
+    maxWidth: "100px",
+    whiteSpace: "nowrap",
+    overflow: "hidden",
+    textOverflow: "ellipsis",
   },
 };
 
 function Navbar() {
   const location = useLocation();
-  const navigate = useNavigate();
 
   const displayName = localStorage.getItem("displayName");
   const photoURL = localStorage.getItem("photoURL");
@@ -78,7 +89,7 @@ function Navbar() {
 
   const linksForDashboard = [
     { to: "/", label: "Home" },
-    { to: "/meetings", label: "My Meetings" },
+    { to: "/meetings", label: "Meetings" },
     { to: "/favorites", label: "Favorites" },
     { to: "/settings", icon: <MdSettings /> },
     { to: "/logout", icon: <MdLogout /> },
@@ -86,7 +97,7 @@ function Navbar() {
 
   const linksForMyMeetings = [
     { to: "/", label: "Home" },
-    { to: "/dashboard", label: "Dashboard" },
+    { to: "/dashboard", label: "Dash" },
     { to: "/favorites", label: "Favorites" },
     { to: "/settings", icon: <MdSettings /> },
     { to: "/logout", icon: <MdLogout /> },
@@ -94,49 +105,20 @@ function Navbar() {
 
   const links = isMyMeetings ? linksForMyMeetings : linksForDashboard;
 
-  const handleLogout = async () => {
-    try {
-      const auth = getAuth();
-      await signOut(auth);
-      localStorage.removeItem("token");
-      localStorage.removeItem("displayName");
-      localStorage.removeItem("photoURL");
-      toast.success("Logged out!");
-      navigate("/login");
-    } catch (error) {
-      console.error("Logout error:", error);
-      toast.error("Logout failed");
-    }
-  };
-
   return (
     <nav style={styles.nav}>
       <div style={styles.links}>
-        {links.map((link) =>
-          link.to === "/logout" ? (
-            <button
-              key={link.to}
-              onClick={handleLogout}
-              style={{
-                ...styles.link,
-                background: "transparent",
-                border: "none",
-              }}
-              title="Logout"
-            >
-              {link.icon}
-            </button>
-          ) : (
-            <Link
-              key={link.to}
-              to={link.to}
-              style={styles.link}
-              title={link.label || ""}
-            >
+        {links.map((link) => (
+          <motion.div
+            key={link.to}
+            whileHover={{ y: -2, color: "#4eaaff" }}
+            transition={{ type: "spring", stiffness: 300 }}
+          >
+            <Link to={link.to} style={styles.link} title={link.label || ""}>
               {link.icon ? link.icon : link.label}
             </Link>
-          )
-        )}
+          </motion.div>
+        ))}
       </div>
 
       {photoURL && (

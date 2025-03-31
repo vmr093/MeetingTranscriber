@@ -102,6 +102,12 @@ const styles = {
   mobileStack: {
     gridTemplateColumns: "1fr",
   },
+  currentName: {
+    fontStyle: "italic",
+    color: "#bbb",
+    marginBottom: "0.5rem",
+    textAlign: "center",
+  },
 };
 
 function Settings() {
@@ -229,6 +235,9 @@ function Settings() {
                 }}
               >
                 <div style={styles.section}>
+                  {displayName && (
+                    <div style={styles.currentName}>Current: {displayName}</div>
+                  )}
                   {previewImage && (
                     <img
                       src={previewImage}
@@ -254,7 +263,7 @@ function Settings() {
                 </div>
 
                 <div style={styles.section}>
-                  <label style={styles.label}>Display Name</label>
+                  <label style={styles.label}>Change Display Name</label>
                   <input
                     style={styles.input}
                     value={displayName}
