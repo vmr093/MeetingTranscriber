@@ -19,6 +19,20 @@ router.get("/", async (req, res) => {
   }
 });
 
+// GET /api/meetings/favorites - Fetch only favorites
+router.get("/favorites", async (req, res) => {
+  try {
+    const favorites = await Meeting.find({ isFavorite: true }).sort({
+      uploadedAt: -1,
+    });
+    res.json(favorites);
+  } catch (err) {
+    console.error("Error fetching favorites:", err);
+    res.status(500).json({ message: "Failed to fetch favorites" });
+  }
+});
+
+
 // PATCH /api/meetings/:id/summary
 router.patch("/:id/summary", async (req, res) => {
   const { summary } = req.body;

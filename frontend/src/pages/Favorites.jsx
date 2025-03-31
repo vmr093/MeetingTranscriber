@@ -38,16 +38,14 @@ function Favorites() {
 
   useEffect(() => {
     axios
-      .get(`${import.meta.env.VITE_API_BASE_URL}/api/meetings`)
-      .then((res) => {
-        const filtered = res.data.filter((meeting) => meeting.isFavorite);
-        setFavorites(filtered);
-      })
+      .get(`${import.meta.env.VITE_API_BASE_URL}/api/meetings/favorites`)
+      .then((res) => setFavorites(res.data))
       .catch((err) => {
         console.error("Failed to fetch favorites", err);
         toast.error("Could not load favorites");
       });
   }, []);
+
 
   const handleToggleFavorite = async (meetingId) => {
     try {
